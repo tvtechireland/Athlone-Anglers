@@ -26,21 +26,22 @@ the committee login, for free at this scale.
    tables and locks them down so only logged-in committee members can edit
    them (the public can only read news/events/results; member records
    stay private).
-3. Open **Project Settings > API**. Copy the **Project URL** and the
-   **anon public key**.
-4. In `app/`, copy `.env.local.example` to `.env.local` and paste those two
-   values in.
+3. Open **Project Settings > API**. Copy the **Project URL**, the
+   **publishable key**, and the **secret key** (under "Secret keys" — this
+   one bypasses all access rules, so treat it like a password).
+4. In `app/`, copy `.env.local.example` to `.env.local` and paste in all
+   three values (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+   `SUPABASE_SERVICE_ROLE_KEY`).
 5. Restart the dev server (`npm run dev` inside `app/`). The "Supabase isn't
    configured yet" warnings should disappear.
 
 ## 2. Create committee member logins
 
-Supabase Auth handles login. To add a committee member:
-
-1. Supabase dashboard > **Authentication > Users > Add user**.
-2. Enter their email and a temporary password, and tell them to log in at
-   `/committee/login` with it (there's no self-signup — only you add
-   accounts, so random people can't get committee access).
+Log in to the dashboard yourself, then go to **Committee access** in the
+sidebar — it has a form to add a new committee member's email and password
+directly (no email, no Supabase dashboard needed), and a list of current
+logins with a Remove button. There's no self-signup, so only someone already
+logged in to the dashboard can add another committee member.
 
 ## 3. Deploy to Netlify
 

@@ -8,6 +8,7 @@ const NAV = [
   { href: "/committee/news", label: "News" },
   { href: "/committee/events", label: "Events" },
   { href: "/committee/results", label: "Results" },
+  { href: "/committee/team", label: "Committee access" },
 ];
 
 export default async function CommitteeLayout({ children }: { children: React.ReactNode }) {
