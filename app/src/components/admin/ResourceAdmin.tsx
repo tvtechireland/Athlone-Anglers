@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { TABLE_CONFIGS, TableName } from "@/lib/admin/tables";
-import { addRow, deleteRow } from "@/lib/admin/actions";
+import { deleteRow } from "@/lib/admin/actions";
+import AddRowForm from "./AddRowForm";
 
 export default async function ResourceAdmin({ table }: { table: TableName }) {
   const config = TABLE_CONFIGS[table];
@@ -9,46 +10,21 @@ export default async function ResourceAdmin({ table }: { table: TableName }) {
     ? await supabase.from(table).select("*").order("id", { ascending: false })
     : { data: [] };
 
+  const imageField = config.fields.find((f) => f.type === "image");
+
+  const templateKind = table === "news" ? "news" : table === "events" ? "event" : null;
+  const { data: templates } =
+    templateKind && supabase
+      ? await supabase.from("templates").select("*").eq("kind", templateKind).order("name")
+      : { data: null };
+
   return (
     <div className="flex flex-col gap-8">
       <section>
         <h2 className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">
           Add {config.label.toLowerCase()}
         </h2>
-        <form
-          action={async (formData) => {
-            "use server";
-            await addRow(table, formData);
-          }}
-          className="grid gap-3 rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 sm:grid-cols-2"
-        >
-          {config.fields.map((field) => (
-            <label key={field.name} className="flex flex-col gap-1 text-sm">
-              <span className="text-slate-600 dark:text-slate-400">{field.label}</span>
-              {field.type === "textarea" ? (
-                <textarea
-                  name={field.name}
-                  required={field.required}
-                  rows={3}
-                  className="rounded border border-slate-300 bg-white px-2 py-1 dark:border-slate-700 dark:bg-slate-800"
-                />
-              ) : (
-                <input
-                  name={field.name}
-                  type={field.type === "date" ? "date" : field.type === "number" ? "number" : "text"}
-                  required={field.required}
-                  className="rounded border border-slate-300 bg-white px-2 py-1 dark:border-slate-700 dark:bg-slate-800"
-                />
-              )}
-            </label>
-          ))}
-          <button
-            type="submit"
-            className="col-span-full mt-1 w-fit rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 dark:bg-white dark:text-slate-900"
-          >
-            Add
-          </button>
-        </form>
+        <AddRowForm table={table} fields={config.fields} templates={templates ?? undefined} />
       </section>
 
       <section>
@@ -66,7 +42,17 @@ export default async function ResourceAdmin({ table }: { table: TableName }) {
               key={String(row.id)}
               className="flex items-center justify-between rounded border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-800 dark:bg-slate-900"
             >
-              <span>{String(row[config.titleField] ?? row.id)}</span>
+              <span className="flex items-center gap-2">
+                {imageField && row[imageField.name] ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={String(row[imageField.name])}
+                    alt=""
+                    className="h-8 w-8 rounded object-cover"
+                  />
+                ) : null}
+                {String(row[config.titleField] ?? row.id)}
+              </span>
               <form
                 action={async () => {
                   "use server";

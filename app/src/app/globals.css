@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
+/* Dark is the site's actual look (club-branded), not just a prefers-color-scheme
+   fallback - switch Tailwind's dark: variant to a class on <html> (set in
+   layout.tsx) so it's always on regardless of the visitor's OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0b0f14;
+  --foreground: #f1e9d8;
 }
 
 @theme inline {
@@ -12,41 +17,21 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   background-color: var(--background);
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(14, 116, 144, 0.12), transparent),
-    linear-gradient(180deg, #eaf6fb 0%, #dcedf5 40%, #cfe7f0 100%);
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(180, 60, 50, 0.14), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 10%, rgba(201, 162, 39, 0.08), transparent),
+    linear-gradient(180deg, #0b0f14 0%, #0d1821 45%, #0a1115 100%);
   background-attachment: fixed;
   min-height: 100vh;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(56, 189, 248, 0.08), transparent),
-      linear-gradient(180deg, #0a0a0a 0%, #0b1a20 50%, #081318 100%);
-  }
-}
-
 /* Subtle wave band, like water, running behind the header */
 .water-waves {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0,40 C 240,80 480,0 720,40 C 960,80 1200,0 1440,40 L1440,80 L0,80 Z' fill='%23bfe1ec'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0,40 C 240,80 480,0 720,40 C 960,80 1200,0 1440,40 L1440,80 L0,80 Z' fill='%23132330'/%3E%3C/svg%3E");
   background-repeat: repeat-x;
   background-size: 1440px 80px;
-}
-
-@media (prefers-color-scheme: dark) {
-  .water-waves {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0,40 C 240,80 480,0 720,40 C 960,80 1200,0 1440,40 L1440,80 L0,80 Z' fill='%23123'/%3E%3C/svg%3E");
-  }
 }

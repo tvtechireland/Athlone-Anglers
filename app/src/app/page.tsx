@@ -47,12 +47,14 @@ export default async function Home() {
           </div>
           <ul className="flex flex-col gap-3">
             {latestNews.map((item) => (
-              <li
-                key={item.id}
-                className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
-              >
-                <h3 className="font-medium text-slate-900 dark:text-white">{item.title}</h3>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{item.body}</p>
+              <li key={item.id}>
+                <Link
+                  href={`/news/${item.id}`}
+                  className="block rounded-lg border border-slate-200 bg-white p-4 transition hover:border-amber-600 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-amber-500"
+                >
+                  <h3 className="font-medium text-slate-900 dark:text-white">{item.title}</h3>
+                  <p className="mt-1 line-clamp-2 text-sm text-slate-500 dark:text-slate-400">{item.body}</p>
+                </Link>
               </li>
             ))}
           </ul>
@@ -70,19 +72,21 @@ export default async function Home() {
           </div>
           <ul className="flex flex-col gap-3">
             {upcomingEvents.map((item) => (
-              <li
-                key={item.id}
-                className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
-              >
-                <h3 className="font-medium text-slate-900 dark:text-white">{item.title}</h3>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  {new Date(item.event_date).toLocaleDateString("en-IE", {
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                  })}
-                  {item.location ? ` · ${item.location}` : ""}
-                </p>
+              <li key={item.id}>
+                <Link
+                  href={`/events/${item.id}`}
+                  className="block rounded-lg border border-slate-200 bg-white p-4 transition hover:border-amber-600 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-amber-500"
+                >
+                  <h3 className="font-medium text-slate-900 dark:text-white">{item.title}</h3>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    {new Date(item.event_date).toLocaleDateString("en-IE", {
+                      weekday: "short",
+                      day: "numeric",
+                      month: "short",
+                    })}
+                    {item.location ? ` · ${item.location}` : ""}
+                  </p>
+                </Link>
               </li>
             ))}
           </ul>

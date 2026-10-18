@@ -1,8 +1,8 @@
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t border-sky-900/10 bg-white/70 py-6 text-center text-sm text-slate-500 backdrop-blur-md dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-400">
+    <footer className="mt-auto border-t border-red-900/30 bg-slate-950/80 py-6 text-center text-sm text-amber-100/50 backdrop-blur-md dark:border-red-900/30 dark:bg-slate-950/80 dark:text-amber-100/50">
       Athlone Anglers Club &middot; Find us on{" "}
-      <a href="#" className="underline hover:text-slate-700 dark:hover:text-slate-200">
+      <a href="#" className="underline hover:text-amber-200 dark:hover:text-amber-200">
         Facebook
       </a>
     </footer>

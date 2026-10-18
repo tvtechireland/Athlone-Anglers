@@ -60,7 +60,7 @@ export default function TeamForm() {
       <button
         type="submit"
         disabled={pending}
-        className="col-span-full mt-1 w-fit rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60 dark:bg-white dark:text-slate-900"
+        className="col-span-full mt-1 w-fit rounded bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 disabled:opacity-60 dark:bg-amber-500 dark:text-slate-950 dark:hover:bg-amber-400"
       >
         {pending ? "Adding…" : "Add committee member"}
       </button>

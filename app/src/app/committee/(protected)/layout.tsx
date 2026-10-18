@@ -8,6 +8,8 @@ const NAV = [
   { href: "/committee/news", label: "News" },
   { href: "/committee/events", label: "Events" },
   { href: "/committee/results", label: "Results" },
+  { href: "/committee/rules", label: "Club rules" },
+  { href: "/committee/templates", label: "Templates" },
   { href: "/committee/team", label: "Committee access" },
 ];
 

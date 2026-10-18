@@ -19,6 +19,21 @@ export function PikeIcon({ className }: IconProps) {
   );
 }
 
+export function ScrollIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
+      <path
+        d="M6 4h12v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="M6 4a2 2 0 1 0-2 2h2M18 4a2 2 0 1 1 2 2h-2" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M9 9h6M9 12h6M9 15h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function TroutIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 56 24" fill="none" className={className} aria-hidden>
