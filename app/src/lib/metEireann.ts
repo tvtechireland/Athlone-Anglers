@@ -77,7 +77,7 @@ export function parseForecastXml(xml: string): ForecastEntry[] {
 export type DailyForecast = {
   date: string; // YYYY-MM-DD, Europe/Dublin local
   weekday: string; // "Mon", "Tue", ...
-  isPast: boolean;
+  isToday: boolean;
   temperatureC: number | null;
   windSpeedKmh: number | null;
   windDirectionDeg: number | null;
@@ -107,40 +107,31 @@ function localHour(iso: string): number {
   return Number(DUBLIN_HOUR.format(new Date(iso)));
 }
 
-// Builds a fixed Monday-to-Sunday week (the week containing "today" in
-// Ireland), picking the forecast entry closest to local 1pm for each day.
-// Days before today have no data (Met Éireann only forecasts forward), so
-// they're returned with null readings and isPast: true.
+// Builds a rolling 7-day forecast starting today (today first, then the
+// next 6 days in order), picking the forecast entry closest to local 1pm
+// for each day - matches how every weather app lays out a week strip.
 export function buildWeeklyForecast(entries: ForecastEntry[]): DailyForecast[] {
   const now = new Date();
-  const todayKey = DUBLIN_DATE.format(now);
-
-  const weekdayIndex = (() => {
-    const map = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const short = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Dublin", weekday: "short" }).format(now);
-    return map.indexOf(short); // 0=Sun..6=Sat
-  })();
-  const daysSinceMonday = (weekdayIndex + 6) % 7; // Mon=0..Sun=6
-
-  const monday = new Date(now);
-  monday.setUTCDate(monday.getUTCDate() - daysSinceMonday);
+  const currentHour = localHour(now.toISOString());
 
   const days: DailyForecast[] = [];
   for (let i = 0; i < 7; i++) {
-    const d = new Date(monday);
-    d.setUTCDate(monday.getUTCDate() + i);
+    const d = new Date(now);
+    d.setUTCDate(d.getUTCDate() + i);
     const dateKey = localDateKey(d.toISOString());
-    const isPast = dateKey < todayKey;
+    // For today, show the nearest current/upcoming hour; for future days,
+    // a midday reading is the most useful single snapshot.
+    const targetHour = i === 0 ? currentHour : 13;
 
     let best: ForecastEntry | null = null;
     let bestDiff = Infinity;
     for (const entry of entries) {
       // Entries with no temperature are precipitation-only interval blocks
       // (see parseForecastXml) - skip them, don't let them win on proximity
-      // to 1pm over an hour that actually has a reading.
+      // to the target hour over one that actually has a reading.
       if (entry.temperatureC === null) continue;
       if (localDateKey(entry.from) !== dateKey) continue;
-      const diff = Math.abs(localHour(entry.from) - 13);
+      const diff = Math.abs(localHour(entry.from) - targetHour);
       if (diff < bestDiff) {
         best = entry;
         bestDiff = diff;
@@ -150,7 +141,7 @@ export function buildWeeklyForecast(entries: ForecastEntry[]): DailyForecast[] {
     days.push({
       date: dateKey,
       weekday: DUBLIN_WEEKDAY.format(d),
-      isPast,
+      isToday: i === 0,
       temperatureC: best?.temperatureC ?? null,
       windSpeedKmh: best?.windSpeedMps != null ? Math.round(best.windSpeedMps * 3.6) : null,
       windDirectionDeg: best?.windDirectionDeg ?? null,

@@ -9,7 +9,7 @@ const LINKS = [
 
 export default function Nav() {
   return (
-    <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+    <header className="sticky top-0 z-10 border-b border-sky-900/10 bg-white/70 backdrop-blur-md dark:border-white/10 dark:bg-slate-950/70">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-4">
         <Link href="/" className="text-lg font-bold text-slate-900 dark:text-white">
           Athlone Anglers
@@ -32,6 +32,7 @@ export default function Nav() {
           </Link>
         </nav>
       </div>
+      <div className="water-waves h-4 w-full" />
     </header>
   );
 }

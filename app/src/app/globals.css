@@ -20,7 +20,33 @@
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(14, 116, 144, 0.12), transparent),
+    linear-gradient(180deg, #eaf6fb 0%, #dcedf5 40%, #cfe7f0 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(56, 189, 248, 0.08), transparent),
+      linear-gradient(180deg, #0a0a0a 0%, #0b1a20 50%, #081318 100%);
+  }
+}
+
+/* Subtle wave band, like water, running behind the header */
+.water-waves {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0,40 C 240,80 480,0 720,40 C 960,80 1200,0 1440,40 L1440,80 L0,80 Z' fill='%23bfe1ec'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 1440px 80px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .water-waves {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath d='M0,40 C 240,80 480,0 720,40 C 960,80 1200,0 1440,40 L1440,80 L0,80 Z' fill='%23123'/%3E%3C/svg%3E");
+  }
 }

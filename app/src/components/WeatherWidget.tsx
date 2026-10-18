@@ -11,9 +11,13 @@ function WindCompass({ directionDeg }: { directionDeg: number | null }) {
       <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-[9px] text-slate-400">S</span>
       <span className="absolute left-0.5 top-1/2 -translate-y-1/2 text-[9px] text-slate-400">W</span>
       {directionDeg !== null && (
+        // Positioned with margins (not translate) so the inline `rotate()`
+        // below is the only transform in play — stacking it with a
+        // translate-based className would silently clobber the className's
+        // transform since both set the same CSS property.
         <div
-          className="absolute left-1/2 top-1/2 h-5 w-0.5 origin-bottom -translate-x-1/2 -translate-y-full bg-sky-600 dark:bg-sky-400"
-          style={{ transform: `translate(-50%, -100%) rotate(${directionDeg}deg)` }}
+          className="absolute left-1/2 top-1/2 -ml-px -mt-5 h-5 w-0.5 bg-sky-600 dark:bg-sky-400"
+          style={{ transform: `rotate(${directionDeg}deg)`, transformOrigin: "bottom center" }}
           title={`Wind from ${directionDeg}°`}
         >
           <div className="absolute -top-1 left-1/2 h-0 w-0 -translate-x-1/2 border-x-[4px] border-b-[6px] border-x-transparent border-b-sky-600 dark:border-b-sky-400" />
@@ -55,14 +59,16 @@ export default function WeatherWidget() {
       <h3 className="mb-3 text-sm font-semibold text-slate-500 dark:text-slate-400">
         Athlone conditions this week — Met Éireann
       </h3>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+      <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
         {days.map((day) => (
           <div
             key={day.date}
-            className="flex flex-col items-center gap-2 rounded-md border border-slate-100 p-2 text-center dark:border-slate-800"
+            className="flex w-24 flex-shrink-0 snap-start flex-col items-center gap-2 rounded-md border border-slate-100 p-2 text-center dark:border-slate-800"
           >
-            <span className="text-xs font-medium text-slate-600 dark:text-slate-300">{day.weekday}</span>
-            {day.isPast || day.temperatureC === null ? (
+            <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
+              {day.isToday ? "Today" : day.weekday}
+            </span>
+            {day.temperatureC === null ? (
               <span className="text-xs text-slate-400">—</span>
             ) : (
               <>
