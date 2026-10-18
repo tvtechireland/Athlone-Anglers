@@ -36,8 +36,8 @@ export default function WeatherWidget() {
     );
   }
 
-  const now = entries[0];
-  const next6 = entries.slice(1, 7);
+  const now = entries.find((e) => e.temperatureC !== null) ?? entries[0];
+  const next6 = entries.filter((e) => e !== now && e.temperatureC !== null).slice(0, 6);
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
