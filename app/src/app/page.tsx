@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import WeatherWidget from "@/components/WeatherWidget";
 import { getNews, getEvents } from "@/lib/content";
+import { PikeIcon, TroutIcon } from "@/components/icons/FishIcons";
 import clubHero from "../../public/images/club-hero.jpg";
 
 export default async function Home() {
@@ -28,6 +29,7 @@ export default async function Home() {
             News, events, and competition results for the club.
           </p>
         </div>
+        <PikeIcon className="h-6 w-full text-sky-700/40 dark:text-sky-400/30" />
       </section>
 
       <WeatherWidget />
@@ -35,7 +37,10 @@ export default async function Home() {
       <div className="grid gap-8 sm:grid-cols-2">
         <section>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Latest news</h2>
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
+              <TroutIcon className="h-5 w-10 text-sky-700 dark:text-sky-400" />
+              Latest news
+            </h2>
             <Link href="/news" className="text-sm text-slate-500 hover:underline dark:text-slate-400">
               View all
             </Link>
@@ -55,7 +60,10 @@ export default async function Home() {
 
         <section>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Upcoming events</h2>
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
+              <PikeIcon className="h-5 w-10 text-sky-700 dark:text-sky-400" />
+              Upcoming events
+            </h2>
             <Link href="/events" className="text-sm text-slate-500 hover:underline dark:text-slate-400">
               View all
             </Link>

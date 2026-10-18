@@ -1,11 +1,15 @@
 import { getEvents } from "@/lib/content";
+import { PikeIcon } from "@/components/icons/FishIcons";
 
 export default async function EventsPage() {
   const events = await getEvents();
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10">
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Events & competitions</h1>
+      <h1 className="flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
+        <PikeIcon className="h-7 w-16 text-sky-700 dark:text-sky-400" />
+        Events & competitions
+      </h1>
       <ul className="flex flex-col gap-4">
         {events.map((item) => (
           <li

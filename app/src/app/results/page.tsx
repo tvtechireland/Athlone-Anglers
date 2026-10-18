@@ -1,4 +1,5 @@
 import { getResults, getLeaderboard } from "@/lib/content";
+import { PikeIcon, TroutIcon } from "@/components/icons/FishIcons";
 
 export default async function ResultsPage() {
   const [results, leaderboard] = await Promise.all([getResults(), getLeaderboard()]);
@@ -6,7 +7,10 @@ export default async function ResultsPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-10 px-4 py-10">
       <section className="flex flex-col gap-3">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">League leaderboard</h1>
+        <h1 className="flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
+          <PikeIcon className="h-7 w-16 text-sky-700 dark:text-sky-400" />
+          League leaderboard
+        </h1>
         <table className="w-full overflow-hidden rounded-lg border border-slate-200 text-left text-sm dark:border-slate-800">
           <thead className="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
             <tr>
@@ -34,7 +38,10 @@ export default async function ResultsPage() {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Competition results</h2>
+        <h2 className="flex items-center gap-3 text-xl font-bold text-slate-900 dark:text-white">
+          <TroutIcon className="h-6 w-12 text-sky-700 dark:text-sky-400" />
+          Competition results
+        </h2>
         <table className="w-full overflow-hidden rounded-lg border border-slate-200 text-left text-sm dark:border-slate-800">
           <thead className="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
             <tr>
