@@ -104,6 +104,16 @@ export async function getCompetitions() {
   return data ?? [];
 }
 
+export async function getCompetitionPhotos() {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data } = await supabase
+    .from("competition_photos")
+    .select("*")
+    .order("created_at", { ascending: false });
+  return data ?? [];
+}
+
 export async function getRules() {
   const supabase = await createClient();
   if (!supabase) return SAMPLE_RULES;

@@ -19,12 +19,16 @@ type Competition = {
   sponsor_logo_url: string | null;
 };
 
+type Photo = { id: string; competition_id: string; url: string };
+
 export default function ResultsBrowser({
   results,
   competitions,
+  photos,
 }: {
   results: ResultRow[];
   competitions: Competition[];
+  photos?: Photo[];
 }) {
   const [competitionFilter, setCompetitionFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
@@ -41,6 +45,15 @@ export default function ResultsBrowser({
     }
     return map;
   }, [competitions]);
+
+  const photosByCompetitionId = useMemo(() => {
+    const map = new Map<string, Photo[]>();
+    for (const p of photos ?? []) {
+      if (!map.has(p.competition_id)) map.set(p.competition_id, []);
+      map.get(p.competition_id)!.push(p);
+    }
+    return map;
+  }, [photos]);
 
   const filtered = results.filter((r) => {
     if (competitionFilter !== "all" && r.competition_name !== competitionFilter) return false;
@@ -105,6 +118,7 @@ export default function ResultsBrowser({
 
       {groups.map((group) => {
         const sponsor = sponsorByKey.get(`${group.name}__${String(group.date).slice(0, 10)}`);
+        const competitionPhotos = sponsor ? photosByCompetitionId.get(sponsor.id) ?? [] : [];
         return (
           <section key={`${group.name}__${group.date}`} className="flex flex-col gap-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -125,6 +139,14 @@ export default function ResultsBrowser({
                 </span>
               )}
             </div>
+            {competitionPhotos.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {competitionPhotos.map((p) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={p.id} src={p.url} alt="" className="h-20 w-20 rounded object-cover" />
+                ))}
+              </div>
+            )}
             <table className="w-full overflow-hidden rounded-lg border border-slate-200 text-left text-sm dark:border-slate-800">
               <thead className="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 <tr>

@@ -39,6 +39,13 @@ create table if not exists competitions (
   created_at timestamptz not null default now()
 );
 
+create table if not exists competition_photos (
+  id uuid primary key default gen_random_uuid(),
+  competition_id uuid not null references competitions(id) on delete cascade,
+  url text not null,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists results (
   id uuid primary key default gen_random_uuid(),
   competition_name text not null,
@@ -79,6 +86,7 @@ alter table news enable row level security;
 alter table events enable row level security;
 alter table results enable row level security;
 alter table competitions enable row level security;
+alter table competition_photos enable row level security;
 alter table rules enable row level security;
 alter table templates enable row level security;
 
@@ -98,6 +106,8 @@ drop policy if exists "Public read" on results;
 create policy "Public read" on results for select using (true);
 drop policy if exists "Public read" on competitions;
 create policy "Public read" on competitions for select using (true);
+drop policy if exists "Public read" on competition_photos;
+create policy "Public read" on competition_photos for select using (true);
 drop policy if exists "Public read" on rules;
 create policy "Public read" on rules for select using (true);
 
@@ -128,6 +138,11 @@ drop policy if exists "Committee update" on competitions;
 create policy "Committee update" on competitions for update using (auth.role() = 'authenticated');
 drop policy if exists "Committee delete" on competitions;
 create policy "Committee delete" on competitions for delete using (auth.role() = 'authenticated');
+
+drop policy if exists "Committee write" on competition_photos;
+create policy "Committee write" on competition_photos for insert with check (auth.role() = 'authenticated');
+drop policy if exists "Committee delete" on competition_photos;
+create policy "Committee delete" on competition_photos for delete using (auth.role() = 'authenticated');
 
 drop policy if exists "Committee write" on rules;
 create policy "Committee write" on rules for insert with check (auth.role() = 'authenticated');

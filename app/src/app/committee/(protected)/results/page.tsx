@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import ResourceAdmin from "@/components/admin/ResourceAdmin";
 import { deleteRow } from "@/lib/admin/actions";
 import ResultForm from "./ResultForm";
+import ShareResultsForm from "./ShareResultsForm";
 
 export default async function ResultsAdminPage() {
   const supabase = await createClient();
@@ -24,7 +25,18 @@ export default async function ResultsAdminPage() {
       </section>
 
       <section>
-        <h2 className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">Add a result</h2>
+        <h2 className="mb-1 text-lg font-semibold text-slate-900 dark:text-white">
+          Record &amp; share winners
+        </h2>
+        <p className="mb-3 text-sm text-slate-600 dark:text-slate-400">
+          Fill in as many of the top 5 as you have, attach photos if you want, then share straight to
+          WhatsApp or copy a caption for Facebook.
+        </p>
+        <ShareResultsForm competitions={competitions ?? []} />
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">Add a single result</h2>
         <ResultForm competitions={competitions ?? []} />
       </section>
 

@@ -1,12 +1,13 @@
-import { getResults, getLeaderboard, getCompetitions } from "@/lib/content";
+import { getResults, getLeaderboard, getCompetitions, getCompetitionPhotos } from "@/lib/content";
 import { PikeIcon, TroutIcon } from "@/components/icons/FishIcons";
 import ResultsBrowser from "@/components/ResultsBrowser";
 
 export default async function ResultsPage() {
-  const [results, leaderboard, competitions] = await Promise.all([
+  const [results, leaderboard, competitions, photos] = await Promise.all([
     getResults(),
     getLeaderboard(),
     getCompetitions(),
+    getCompetitionPhotos(),
   ]);
 
   return (
@@ -47,7 +48,7 @@ export default async function ResultsPage() {
           <TroutIcon className="h-6 w-12 text-sky-700 dark:text-sky-400" />
           Competition results
         </h2>
-        <ResultsBrowser results={results} competitions={competitions} />
+        <ResultsBrowser results={results} competitions={competitions} photos={photos} />
       </section>
     </div>
   );
