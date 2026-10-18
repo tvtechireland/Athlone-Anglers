@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import crest from "../../public/images/club-crest.png";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -11,7 +13,8 @@ export default function Nav() {
   return (
     <header className="sticky top-0 z-10 border-b border-sky-900/10 bg-white/70 backdrop-blur-md dark:border-white/10 dark:bg-slate-950/70">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-4">
-        <Link href="/" className="text-lg font-bold text-slate-900 dark:text-white">
+        <Link href="/" className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white">
+          <Image src={crest} alt="" aria-hidden className="h-10 w-10" />
           Athlone Anglers
         </Link>
         <nav className="flex flex-wrap gap-4 text-sm">
