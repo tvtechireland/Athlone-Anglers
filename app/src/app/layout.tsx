@@ -19,6 +19,12 @@ export const metadata: Metadata = {
   description: "Athlone Anglers fishing club — news, events, competition results.",
 };
 
+// Most pages read the Supabase session cookie (content fetches go through
+// the server client, committee pages check auth), so they're request-time
+// by nature. Opt the whole app out of Cache Components' static-shell
+// prerendering rather than restructuring every page behind Suspense.
+export const instant = false;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
