@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Athlone Anglers",
-  description: "Athlone Anglers fishing club — news, events, waters & permits, competition results.",
+  description: "Athlone Anglers fishing club — news, events, competition results.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

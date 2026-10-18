@@ -74,6 +74,92 @@ export function parseForecastXml(xml: string): ForecastEntry[] {
   return Array.from(byFrom.values()).sort((a, b) => a.from.localeCompare(b.from));
 }
 
+export type DailyForecast = {
+  date: string; // YYYY-MM-DD, Europe/Dublin local
+  weekday: string; // "Mon", "Tue", ...
+  isPast: boolean;
+  temperatureC: number | null;
+  windSpeedKmh: number | null;
+  windDirectionDeg: number | null;
+};
+
+const DUBLIN_DATE = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Dublin",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+const DUBLIN_HOUR = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Europe/Dublin",
+  hour: "2-digit",
+  hourCycle: "h23",
+});
+const DUBLIN_WEEKDAY = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Europe/Dublin",
+  weekday: "short",
+});
+
+function localDateKey(iso: string): string {
+  return DUBLIN_DATE.format(new Date(iso));
+}
+
+function localHour(iso: string): number {
+  return Number(DUBLIN_HOUR.format(new Date(iso)));
+}
+
+// Builds a fixed Monday-to-Sunday week (the week containing "today" in
+// Ireland), picking the forecast entry closest to local 1pm for each day.
+// Days before today have no data (Met Éireann only forecasts forward), so
+// they're returned with null readings and isPast: true.
+export function buildWeeklyForecast(entries: ForecastEntry[]): DailyForecast[] {
+  const now = new Date();
+  const todayKey = DUBLIN_DATE.format(now);
+
+  const weekdayIndex = (() => {
+    const map = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const short = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Dublin", weekday: "short" }).format(now);
+    return map.indexOf(short); // 0=Sun..6=Sat
+  })();
+  const daysSinceMonday = (weekdayIndex + 6) % 7; // Mon=0..Sun=6
+
+  const monday = new Date(now);
+  monday.setUTCDate(monday.getUTCDate() - daysSinceMonday);
+
+  const days: DailyForecast[] = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setUTCDate(monday.getUTCDate() + i);
+    const dateKey = localDateKey(d.toISOString());
+    const isPast = dateKey < todayKey;
+
+    let best: ForecastEntry | null = null;
+    let bestDiff = Infinity;
+    for (const entry of entries) {
+      // Entries with no temperature are precipitation-only interval blocks
+      // (see parseForecastXml) - skip them, don't let them win on proximity
+      // to 1pm over an hour that actually has a reading.
+      if (entry.temperatureC === null) continue;
+      if (localDateKey(entry.from) !== dateKey) continue;
+      const diff = Math.abs(localHour(entry.from) - 13);
+      if (diff < bestDiff) {
+        best = entry;
+        bestDiff = diff;
+      }
+    }
+
+    days.push({
+      date: dateKey,
+      weekday: DUBLIN_WEEKDAY.format(d),
+      isPast,
+      temperatureC: best?.temperatureC ?? null,
+      windSpeedKmh: best?.windSpeedMps != null ? Math.round(best.windSpeedMps * 3.6) : null,
+      windDirectionDeg: best?.windDirectionDeg ?? null,
+    });
+  }
+
+  return days;
+}
+
 export async function fetchAthloneForecast(): Promise<ForecastEntry[]> {
   const url = `${FORECAST_URL}?lat=${ATHLONE_COORDS.lat};long=${ATHLONE_COORDS.long}`;
 

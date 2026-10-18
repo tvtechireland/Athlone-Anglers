@@ -25,13 +25,6 @@ create table if not exists events (
   location text
 );
 
-create table if not exists waters (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  description text,
-  permit_info text
-);
-
 create table if not exists results (
   id uuid primary key default gen_random_uuid(),
   competition_name text not null,
@@ -46,7 +39,6 @@ create table if not exists results (
 alter table members enable row level security;
 alter table news enable row level security;
 alter table events enable row level security;
-alter table waters enable row level security;
 alter table results enable row level security;
 
 -- Members contain personal data (email), so unlike the other tables
@@ -55,7 +47,6 @@ create policy "Committee only" on members for all using (auth.role() = 'authenti
 
 create policy "Public read" on news for select using (true);
 create policy "Public read" on events for select using (true);
-create policy "Public read" on waters for select using (true);
 create policy "Public read" on results for select using (true);
 
 create policy "Committee write" on news for insert with check (auth.role() = 'authenticated');
@@ -65,10 +56,6 @@ create policy "Committee delete" on news for delete using (auth.role() = 'authen
 create policy "Committee write" on events for insert with check (auth.role() = 'authenticated');
 create policy "Committee update" on events for update using (auth.role() = 'authenticated');
 create policy "Committee delete" on events for delete using (auth.role() = 'authenticated');
-
-create policy "Committee write" on waters for insert with check (auth.role() = 'authenticated');
-create policy "Committee update" on waters for update using (auth.role() = 'authenticated');
-create policy "Committee delete" on waters for delete using (auth.role() = 'authenticated');
 
 create policy "Committee write" on results for insert with check (auth.role() = 'authenticated');
 create policy "Committee update" on results for update using (auth.role() = 'authenticated');

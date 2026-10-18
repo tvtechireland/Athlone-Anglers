@@ -1,6 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import WeatherWidget from "@/components/WeatherWidget";
 import { getNews, getEvents } from "@/lib/content";
+import clubHero from "../../public/images/club-hero.jpg";
 
 export default async function Home() {
   const [news, events] = await Promise.all([getNews(), getEvents()]);
@@ -9,11 +11,23 @@ export default async function Home() {
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-10 px-4 py-10">
-      <section className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Athlone Anglers</h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          News, events, waters & permits, and competition results for the club.
-        </p>
+      <section className="flex flex-col gap-4">
+        <div className="relative h-64 w-full overflow-hidden rounded-lg sm:h-80">
+          <Image
+            src={clubHero}
+            alt="Athlone Anglers members fishing from boats at the lock"
+            fill
+            priority
+            className="object-cover"
+            sizes="(max-width: 1024px) 100vw, 1024px"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Athlone Anglers</h1>
+          <p className="text-slate-600 dark:text-slate-400">
+            News, events, and competition results for the club.
+          </p>
+        </div>
       </section>
 
       <WeatherWidget />

@@ -2,28 +2,29 @@
 
 ## What's built so far
 
-- **Public site** (`/`, `/news`, `/events`, `/waters`, `/results`): mobile-friendly,
+- **Public site** (`/`, `/news`, `/events`, `/results`): mobile-friendly,
   shows placeholder content until the database is connected.
 - **Committee login + dashboard** (`/committee/login`, `/committee/dashboard`,
-  and a manage page for members/news/events/waters/results): add/delete rows,
+  and a manage page for members/news/events/results): add/delete rows,
   changes show up on the public site immediately.
-- **Weather widget** on the home page, pulling Athlone's forecast live from
-  Met Éireann's free public API — no setup needed, already working.
+- **Weather widget** on the home page, a 7-day Athlone forecast with a wind
+  compass, pulling live from Met Éireann's free public API — no setup
+  needed, already working.
 
 Nothing can be saved yet because there's no database connected — that's step 1
 below.
 
 ## 1. Create a Supabase project (free)
 
-Supabase gives us the database (for members/news/events/waters/results) and
+Supabase gives us the database (for members/news/events/results) and
 the committee login, for free at this scale.
 
 1. Go to https://supabase.com, sign up, and create a new project (pick a
    region close to Ireland, e.g. "West EU").
 2. In the project, open **SQL Editor > New query**, paste in the contents of
-   `docs/schema.sql` from this repo, and run it. This creates the five
+   `docs/schema.sql` from this repo, and run it. This creates the four
    tables and locks them down so only logged-in committee members can edit
-   them (the public can only read news/events/waters/results; member records
+   them (the public can only read news/events/results; member records
    stay private).
 3. Open **Project Settings > API**. Copy the **Project URL** and the
    **anon public key**.

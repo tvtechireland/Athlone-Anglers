@@ -4,8 +4,7 @@ const LINKS = [
   { href: "/", label: "Home" },
   { href: "/news", label: "News" },
   { href: "/events", label: "Events" },
-  { href: "/waters", label: "Waters & Permits" },
-  { href: "/results", label: "Results" },
+  { href: "/results", label: "Leaderboard" },
 ];
 
 export default function Nav() {

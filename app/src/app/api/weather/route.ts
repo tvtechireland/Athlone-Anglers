@@ -1,9 +1,9 @@
-import { fetchAthloneForecast } from "@/lib/metEireann";
+import { buildWeeklyForecast, fetchAthloneForecast } from "@/lib/metEireann";
 
 export async function GET() {
   try {
     const entries = await fetchAthloneForecast();
-    return Response.json({ entries: entries.slice(0, 24) });
+    return Response.json({ days: buildWeeklyForecast(entries) });
   } catch (error) {
     return Response.json(
       { error: "Weather unavailable", detail: String(error) },

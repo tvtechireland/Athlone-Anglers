@@ -7,7 +7,6 @@ const NAV = [
   { href: "/committee/members", label: "Members" },
   { href: "/committee/news", label: "News" },
   { href: "/committee/events", label: "Events" },
-  { href: "/committee/waters", label: "Waters & permits" },
   { href: "/committee/results", label: "Results" },
 ];
 

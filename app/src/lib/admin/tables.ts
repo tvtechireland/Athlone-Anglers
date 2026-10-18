@@ -47,15 +47,6 @@ export const TABLE_CONFIGS: Record<string, TableConfig> = {
       { name: "location", label: "Location", type: "text" },
     ],
   },
-  waters: {
-    label: "Waters & permits",
-    titleField: "name",
-    fields: [
-      { name: "name", label: "Water name", type: "text", required: true },
-      { name: "description", label: "Description", type: "textarea" },
-      { name: "permit_info", label: "Permit info", type: "textarea" },
-    ],
-  },
   results: {
     label: "Competition results",
     titleField: "competition_name",
@@ -69,4 +60,4 @@ export const TABLE_CONFIGS: Record<string, TableConfig> = {
   },
 };
 
-export type TableName = "members" | "news" | "events" | "waters" | "results";
+export type TableName = "members" | "news" | "events" | "results";
