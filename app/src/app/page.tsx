@@ -1,35 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import WeatherWidget from "@/components/WeatherWidget";
-import { getNews, getEvents, getSiteSettings, NEWS_RECENT_DAYS } from "@/lib/content";
+import { getEvents, getSiteSettings } from "@/lib/content";
 import { PikeIcon } from "@/components/icons/FishIcons";
 import clubHero from "../../public/images/club-hero.jpg";
 
 export default async function Home() {
-  const [news, events, settings] = await Promise.all([getNews(), getEvents(), getSiteSettings()]);
+  const [events, settings] = await Promise.all([getEvents(), getSiteSettings()]);
   const today = new Date().toISOString().slice(0, 10);
   const upcomingEvents = events.filter((e) => String(e.event_date).slice(0, 10) >= today).slice(0, 3);
 
-  // Homepage doesn't carry a permanent news list - club news goes out on
-  // WhatsApp instead. The one exception is a fresh announcement: if
-  // something was posted in the last NEWS_RECENT_DAYS, surface just that
-  // single item as a banner up top; otherwise this renders nothing.
-  const cutoff = Date.now() - NEWS_RECENT_DAYS * 86400000;
-  const latestAnnouncement = news.find(
-    (n) => n.published_at && new Date(n.published_at as string).getTime() >= cutoff
-  );
-
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-10 px-4 py-10">
-      {latestAnnouncement && (
-        <Link
-          href={`/news/${latestAnnouncement.id}`}
-          className="rounded-lg border border-amber-500 bg-amber-50 p-4 text-sm font-medium text-amber-900 hover:border-amber-600 dark:border-amber-500/50 dark:bg-amber-950/40 dark:text-amber-200"
-        >
-          📢 {latestAnnouncement.title}
-        </Link>
-      )}
-
       <section className="flex flex-col gap-4">
         <div className="relative h-64 w-full overflow-hidden rounded-lg sm:h-80">
           <Image
