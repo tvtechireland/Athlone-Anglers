@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import crest from "../../public/images/club-crest.png";
 
 const LINKS = [
@@ -18,6 +19,12 @@ const LINKS = [
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Committee pages have their own simple full-screen layout - showing
+  // the public site nav on top of it is what was causing the cramped,
+  // sideways-scrolling mess on mobile.
+  if (pathname?.startsWith("/committee")) return null;
 
   return (
     <header className="sticky top-0 z-10 border-b border-red-900/30 bg-slate-950/80 backdrop-blur-md dark:border-red-900/30 dark:bg-slate-950/80">

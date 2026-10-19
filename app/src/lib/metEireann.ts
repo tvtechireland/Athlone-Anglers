@@ -182,6 +182,35 @@ export function buildHourlyForecast(entries: ForecastEntry[], dateKey: string): 
     .sort((a, b) => a.time.localeCompare(b.time));
 }
 
+// Fixed hour slots 9am-6pm, one row per hour no matter what - for days more
+// than ~48h out, Met Éireann only updates every 6 hours, so several
+// adjacent slots end up reusing the nearest reading rather than showing
+// nothing. That's still better for planning a session than gaps.
+export function buildFishingHoursForecast(entries: ForecastEntry[], dateKey: string): HourlyForecast[] {
+  const hours: HourlyForecast[] = [];
+  for (let targetHour = 9; targetHour <= 18; targetHour++) {
+    let best: ForecastEntry | null = null;
+    let bestDiff = Infinity;
+    for (const entry of entries) {
+      if (entry.temperatureC === null) continue;
+      if (localDateKey(entry.from) !== dateKey) continue;
+      const diff = Math.abs(localHour(entry.from) - targetHour);
+      if (diff < bestDiff) {
+        best = entry;
+        bestDiff = diff;
+      }
+    }
+    hours.push({
+      time: best ? best.from : `${dateKey}T${String(targetHour).padStart(2, "0")}:00:00`,
+      hourLabel: `${String(targetHour).padStart(2, "0")}:00`,
+      temperatureC: best?.temperatureC ?? null,
+      windSpeedKmh: best?.windSpeedMps != null ? Math.round(best.windSpeedMps * 3.6) : null,
+      windDirectionDeg: best?.windDirectionDeg ?? null,
+    });
+  }
+  return hours;
+}
+
 export async function fetchAthloneForecast(): Promise<ForecastEntry[]> {
   const url = `${FORECAST_URL}?lat=${ATHLONE_COORDS.lat};long=${ATHLONE_COORDS.long}`;
 

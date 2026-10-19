@@ -1,6 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith("/committee")) return null;
+
   return (
     <footer className="mt-auto border-t border-red-900/30 bg-slate-950/80 py-6 text-center text-sm text-amber-100/50 backdrop-blur-md dark:border-red-900/30 dark:bg-slate-950/80 dark:text-amber-100/50">
       <p>
