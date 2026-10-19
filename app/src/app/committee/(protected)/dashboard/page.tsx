@@ -14,7 +14,7 @@ export default async function CommitteeDashboard() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Committee dashboard</h1>
         <p className="mt-1 text-slate-600 dark:text-slate-400">
-          Use the links on the left to manage the site. Changes appear immediately.
+          Use the buttons above to manage the site. Changes appear immediately.
         </p>
       </div>
 
