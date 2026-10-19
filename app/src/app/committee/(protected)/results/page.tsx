@@ -1,11 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { deleteRow } from "@/lib/admin/actions";
 import ShareResultsForm from "./ShareResultsForm";
-import { approveResult } from "./actions";
 
 function formatResult(row: { measurement_value: number | null; measurement_type: string | null }) {
   if (!row.measurement_value) return "—";
   return `${row.measurement_value} ${row.measurement_type === "weight_lb" ? "lb" : "cm"}`;
+}
+
+function ordinal(position: number | null) {
+  if (!position) return "";
+  return `, ${position}${position === 1 ? "st" : position === 2 ? "nd" : position === 3 ? "rd" : "th"}`;
 }
 
 export default async function ResultsAdminPage() {
@@ -18,13 +22,13 @@ export default async function ResultsAdminPage() {
       ])
     : [{ data: [] }, { data: [] }];
 
-  const pending = (results ?? []).filter((r) => r.status === "pending");
-  const approved = (results ?? []).filter((r) => r.status === "approved");
-
   return (
     <div className="flex flex-col gap-10">
       <section>
         <h1 className="mb-1 text-2xl font-bold text-slate-900 dark:text-white">Record results</h1>
+        <p className="mb-3 text-sm text-slate-600 dark:text-slate-400">
+          Saving goes straight onto the results page and leaderboard - no extra approval step.
+        </p>
         <ShareResultsForm events={events ?? []} />
       </section>
 
@@ -35,72 +39,25 @@ export default async function ResultsAdminPage() {
       )}
 
       <section>
-        <h2 className="mb-1 text-lg font-semibold text-slate-900 dark:text-white">
-          Waiting for approval {pending.length > 0 && `(${pending.length})`}
+        <h2 className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">
+          Existing results {results && results.length > 0 && `(${results.length})`}
         </h2>
         <p className="mb-3 text-sm text-slate-600 dark:text-slate-400">
-          These won&apos;t show on the website or leaderboard until you press Approve.
+          To correct a mistake, just re-record that angler for the same event above - it overwrites in
+          place. Delete only removes it entirely.
         </p>
         <ul className="flex flex-col gap-2">
-          {pending.map((row) => (
-            <li
-              key={row.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded border border-amber-300 bg-amber-50 px-3 py-3 text-sm dark:border-amber-700 dark:bg-amber-950/40"
-            >
-              <span>
-                <strong>{row.angler_name}</strong> — {row.competition_name}
-                {row.position ? `, ${row.position}${row.position === 1 ? "st" : row.position === 2 ? "nd" : row.position === 3 ? "rd" : "th"}` : ""}
-                {" · "}
-                {formatResult(row)}
-              </span>
-              <span className="flex gap-3">
-                <form
-                  action={async () => {
-                    "use server";
-                    await approveResult(String(row.id));
-                  }}
-                >
-                  <button
-                    type="submit"
-                    className="rounded bg-green-600 px-3 py-2 font-medium text-white hover:bg-green-500"
-                  >
-                    ✓ Approve
-                  </button>
-                </form>
-                <form
-                  action={async () => {
-                    "use server";
-                    await deleteRow("results", String(row.id));
-                  }}
-                >
-                  <button type="submit" className="text-red-600 hover:underline dark:text-red-400">
-                    Delete
-                  </button>
-                </form>
-              </span>
-            </li>
-          ))}
-          {pending.length === 0 && (
-            <li className="text-sm text-slate-500 dark:text-slate-400">Nothing waiting — all caught up.</li>
-          )}
-        </ul>
-      </section>
-
-      <section>
-        <h2 className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">
-          Approved results {approved.length > 0 && `(${approved.length})`}
-        </h2>
-        <ul className="flex flex-col gap-2">
-          {approved.map((row) => (
+          {(results ?? []).map((row) => (
             <li
               key={row.id}
               className="flex flex-wrap items-center justify-between gap-3 rounded border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-800 dark:bg-slate-900"
             >
               <span>
                 {row.angler_name} — {row.competition_name}
-                {row.position ? `, ${row.position}${row.position === 1 ? "st" : row.position === 2 ? "nd" : row.position === 3 ? "rd" : "th"}` : ""}
+                {ordinal(row.position)}
                 {" · "}
                 {formatResult(row)}
+                {row.points != null && ` · ${row.points} pts`}
               </span>
               <form
                 action={async () => {
@@ -114,8 +71,8 @@ export default async function ResultsAdminPage() {
               </form>
             </li>
           ))}
-          {approved.length === 0 && (
-            <li className="text-sm text-slate-500 dark:text-slate-400">No approved results yet.</li>
+          {(!results || results.length === 0) && (
+            <li className="text-sm text-slate-500 dark:text-slate-400">No results recorded yet.</li>
           )}
         </ul>
       </section>

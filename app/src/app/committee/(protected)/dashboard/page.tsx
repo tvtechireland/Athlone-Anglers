@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { setFinalResultsPublished } from "./actions";
+import PublishFinalResultsButton from "./PublishFinalResultsButton";
 
 export default async function CommitteeDashboard() {
   const supabase = await createClient();
@@ -32,23 +32,7 @@ export default async function CommitteeDashboard() {
           mark the leaderboard as the official final result for the year. Nothing happens automatically -
           flip it whenever you&apos;re ready, there&apos;s no fixed date.
         </p>
-        <form
-          action={async () => {
-            "use server";
-            await setFinalResultsPublished(!published);
-          }}
-        >
-          <button
-            type="submit"
-            className={`w-full rounded px-4 py-4 text-base font-semibold sm:w-auto ${
-              published
-                ? "bg-green-600 text-white hover:bg-green-500"
-                : "bg-slate-200 text-slate-800 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600"
-            }`}
-          >
-            {published ? "✓ Final results are published — tap to unpublish" : "Publish final results"}
-          </button>
-        </form>
+        <PublishFinalResultsButton published={published} />
       </section>
     </div>
   );

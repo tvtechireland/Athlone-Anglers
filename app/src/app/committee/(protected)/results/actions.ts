@@ -18,18 +18,17 @@ export type WinnersFormState =
 
 const IMAGE_BUCKET = "public-images";
 
-// Standard angling-club league scoring: last place in the field scores 1
-// point, first place scores (field size) points.
-function computedPoints(position: number, fieldSize: number): number {
-  return Math.max(1, fieldSize - position + 1);
+// Default points per place (1st=5 ... 5th=1) - just a starting point shown
+// in the form; the committee can type over it per angler.
+function defaultPoints(position: number): number {
+  return Math.max(0, 6 - position);
 }
 
-// Batch entry for an event's top 5 placings. Results start as "pending" -
-// they don't count on the public site or any leaderboard until a committee
-// member approves them (see approveResult below). Re-submitting the same
-// angler for the same event corrects their earlier entry instead of
-// rejecting it as a duplicate, since that's the expected way to fix a
-// mistake here.
+// Batch entry for an event's top 5 placings. Results are approved
+// immediately on save - they show on the public site and leaderboard right
+// away, no extra "approve" step. Re-submitting the same angler for the
+// same event corrects their earlier entry instead of rejecting it as a
+// duplicate, since that's the expected way to fix a mistake here.
 export async function recordWinners(
   _prevState: WinnersFormState,
   formData: FormData
@@ -47,7 +46,6 @@ export async function recordWinners(
 
   type Placing = { position: number; angler: string; result: string };
   const placings: Placing[] = [];
-  const fieldSize = [1, 2, 3, 4, 5].filter((p) => String(formData.get(`angler_${p}`) ?? "").trim()).length;
 
   for (let position = 1; position <= 5; position++) {
     const angler = String(formData.get(`angler_${position}`) ?? "").trim();
@@ -57,7 +55,8 @@ export async function recordWinners(
     const measurementType = String(formData.get(`unit_${position}`) ?? "weight_lb");
     const valueRaw = formData.get(`value_${position}`);
     const measurementValue = valueRaw ? Number(valueRaw) : null;
-    const points = computedPoints(position, fieldSize);
+    const pointsRaw = formData.get(`points_${position}`);
+    const points = pointsRaw !== null && pointsRaw !== "" ? Number(pointsRaw) : defaultPoints(position);
 
     const resultLabel = measurementValue
       ? `${measurementValue} ${measurementType === "weight_lb" ? "lb" : "cm"}`
@@ -74,7 +73,7 @@ export async function recordWinners(
       measurement_value: measurementValue,
       position,
       points,
-      status: "pending" as const,
+      status: "approved" as const,
     };
 
     const { data: existing } = await supabase

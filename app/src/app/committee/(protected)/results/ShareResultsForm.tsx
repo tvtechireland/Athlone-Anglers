@@ -102,7 +102,7 @@ export default function ShareResultsForm({ events }: { events: EventRow[] }) {
           {ORDINALS.map((label, i) => (
             <div
               key={label}
-              className="grid gap-2 rounded border border-slate-200 p-3 dark:border-slate-700 sm:grid-cols-[4rem_1fr_auto_6rem]"
+              className="grid gap-2 rounded border border-slate-200 p-3 dark:border-slate-700 sm:grid-cols-[4rem_1fr_auto_6rem_5rem]"
             >
               <span className="self-center font-semibold text-slate-700 dark:text-slate-300">{label}</span>
               <input
@@ -137,6 +137,16 @@ export default function ShareResultsForm({ events }: { events: EventRow[] }) {
                   <option value="length_cm">cm</option>
                 </select>
               </div>
+              <label className="flex flex-col gap-0.5 text-xs text-slate-500 dark:text-slate-400">
+                Points
+                <input
+                  name={`points_${i + 1}`}
+                  type="number"
+                  min={0}
+                  defaultValue={Math.max(0, 5 - i)}
+                  className="rounded border border-slate-300 bg-white px-2 py-2 text-base text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                />
+              </label>
             </div>
           ))}
         </div>
@@ -166,8 +176,7 @@ export default function ShareResultsForm({ events }: { events: EventRow[] }) {
       {state?.success && (
         <div className="flex flex-col gap-3 rounded-lg border border-amber-600/40 bg-amber-50 p-4 text-sm dark:border-amber-500/30 dark:bg-amber-950/30">
           <p className="font-medium text-slate-800 dark:text-amber-200">
-            Saved. These are waiting for a committee member to approve them below before they show on the
-            site.
+            Saved — live on the results page and leaderboard now.
           </p>
           <p className="font-medium text-slate-800 dark:text-amber-200">Share it now:</p>
           <div className="flex flex-wrap gap-3">
