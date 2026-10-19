@@ -22,6 +22,9 @@ export default async function CommitteeLayout({ children }: { children: React.Re
         <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
           <span className="text-lg font-bold text-slate-900 dark:text-white">Committee</span>
           <div className="flex items-center gap-3 text-sm">
+            <Link href="/" className="font-medium text-amber-700 hover:underline dark:text-amber-400">
+              View site
+            </Link>
             <span className="truncate text-slate-500 dark:text-slate-400">{session.email}</span>
             <form action={logout}>
               <button type="submit" className="font-medium text-red-600 hover:underline dark:text-red-400">

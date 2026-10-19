@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { login } from "./actions";
 
 export default function LoginForm() {
@@ -45,6 +46,12 @@ export default function LoginForm() {
             {pending ? "Signing in…" : "Sign in"}
           </button>
         </form>
+        <Link
+          href="/"
+          className="mt-6 block text-center text-sm text-slate-500 hover:underline dark:text-slate-400"
+        >
+          ← Back to the club site
+        </Link>
       </div>
     </div>
   );
