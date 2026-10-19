@@ -84,12 +84,44 @@ export type DailyForecast = {
   symbol: string | null;
 };
 
-// Met Éireann's symbol names are the old yr.no vocabulary (Sun, LightCloud,
-// PartlyCloud, Cloud, LightRain, Rain, RainShowers, Sleet, Snow, Fog, ...) -
-// rather than hard-coding every exact name, bucket by substring into the
-// handful of conditions anyone glancing at an icon actually cares about.
+// Met Éireann's feed doesn't actually send the symbol's "name" attribute in
+// practice (only "number") - the classic yr.no numeric legend: 1-2 clear/
+// fair, 3 partly cloudy, 4 cloudy, 5/9/10 rain(showers), 6/11/14/20-34
+// thunder variants, 7/12 sleet, 8/13 snow, 15 fog, 40-51 light/heavy
+// variants of the above in pairs (40/41 rain showers, 42/43 sleet showers,
+// 44/45 snow showers, 46/47 rain, 48/49 sleet, 50/51 snow).
+const SYMBOL_NUMBER_MAP: Record<string, string> = {
+  "1": "☀️",
+  "2": "🌤️",
+  "3": "⛅",
+  "4": "☁️",
+  "5": "🌧️",
+  "6": "⛈️",
+  "7": "🌨️",
+  "8": "❄️",
+  "9": "🌧️",
+  "10": "🌧️",
+  "11": "⛈️",
+  "12": "🌨️",
+  "13": "❄️",
+  "14": "⛈️",
+  "15": "🌫️",
+};
+
 export function weatherEmoji(symbol: string | null): string {
   if (!symbol) return "";
+
+  if (/^\d+$/.test(symbol)) {
+    if (SYMBOL_NUMBER_MAP[symbol]) return SYMBOL_NUMBER_MAP[symbol];
+    const n = Number(symbol);
+    if (n >= 20 && n <= 34) return "⛈️"; // every thunder variant
+    if (n === 40 || n === 41 || n === 46 || n === 47) return "🌧️";
+    if (n === 42 || n === 43 || n === 48 || n === 49) return "🌨️";
+    if (n === 44 || n === 45 || n === 50 || n === 51) return "❄️";
+    return "";
+  }
+
+  // Fallback for feeds that do send a text name (LightCloud, Rain, ...).
   const s = symbol.toLowerCase();
   if (s.includes("thunder")) return "⛈️";
   if (s.includes("snow")) return "❄️";
