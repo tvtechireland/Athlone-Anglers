@@ -18,10 +18,10 @@ export type WinnersFormState =
 
 const IMAGE_BUCKET = "public-images";
 
-// Default points per place (1st=5 ... 5th=1) - just a starting point shown
-// in the form; the committee can type over it per angler.
-function defaultPoints(position: number): number {
-  return Math.max(0, 6 - position);
+// Default points per place - just a starting point shown in the form, the
+// committee can type over it per angler. Every place defaults to 1.
+function defaultPoints(_position: number): number {
+  return 1;
 }
 
 // Batch entry for an event's top 5 placings. Results are approved

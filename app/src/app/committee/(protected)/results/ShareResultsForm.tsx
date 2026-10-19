@@ -143,7 +143,7 @@ export default function ShareResultsForm({ events }: { events: EventRow[] }) {
                   name={`points_${i + 1}`}
                   type="number"
                   min={0}
-                  defaultValue={Math.max(0, 5 - i)}
+                  defaultValue={1}
                   className="rounded border border-slate-300 bg-white px-2 py-2 text-base text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                 />
               </label>
