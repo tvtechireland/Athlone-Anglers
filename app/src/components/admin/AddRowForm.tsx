@@ -28,6 +28,25 @@ export default function AddRowForm({
   const formRef = useRef<HTMLFormElement>(null);
   const today = new Date().toISOString().slice(0, 10);
 
+  const shareable = table === "news" || table === "events";
+  const shareUrl =
+    state?.success && typeof window !== "undefined"
+      ? `${window.location.origin}/${table}/${state.success.id}`
+      : "";
+  const shareText = state?.success
+    ? [state.success.title, state.success.summary, shareUrl].filter(Boolean).join("\n\n")
+    : "";
+  const whatsappHref = shareText ? `https://wa.me/?text=${encodeURIComponent(shareText)}` : "#";
+
+  async function copyForFacebook() {
+    if (!shareText) return;
+    try {
+      await navigator.clipboard.writeText(shareText);
+    } catch {
+      // clipboard access can fail outside a secure context - non-fatal
+    }
+  }
+
   function applyTemplate(templateId: string) {
     const tpl = templates?.find((t) => t.id === templateId);
     if (!tpl || !formRef.current) return;
@@ -52,11 +71,12 @@ export default function AddRowForm({
   }
 
   return (
-    <form
-      ref={formRef}
-      action={formAction}
-      className="grid gap-3 rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 sm:grid-cols-2"
-    >
+    <div className="flex flex-col gap-4">
+      <form
+        ref={formRef}
+        action={formAction}
+        className="grid gap-3 rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 sm:grid-cols-2"
+      >
       {templates && templates.length > 0 && (
         <label className="col-span-full flex flex-col gap-1 text-sm">
           <span className="text-slate-600 dark:text-slate-400">Start from template</span>
@@ -136,6 +156,28 @@ export default function AddRowForm({
       >
         {pending ? "Adding…" : "Add"}
       </button>
-    </form>
+      </form>
+
+      {shareable && state?.success && (
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-amber-600/40 bg-amber-50 p-3 text-sm dark:border-amber-500/30 dark:bg-amber-950/30">
+          <span className="font-medium text-slate-800 dark:text-amber-200">Share it:</span>
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded bg-green-600 px-3 py-2 font-medium text-white hover:bg-green-500"
+          >
+            Share to WhatsApp
+          </a>
+          <button
+            type="button"
+            onClick={copyForFacebook}
+            className="rounded bg-blue-700 px-3 py-2 font-medium text-white hover:bg-blue-600"
+          >
+            Copy caption for Facebook
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

@@ -5,7 +5,12 @@ import { createClient } from "@/lib/supabase/server";
 import { verifySession } from "@/lib/dal";
 import { TABLE_CONFIGS, TableName } from "./tables";
 
-export type AddRowState = { error?: string; success?: boolean } | undefined;
+export type AddRowState =
+  | {
+      error?: string;
+      success?: { id: string; title: string; summary: string };
+    }
+  | undefined;
 
 const IMAGE_BUCKET = "public-images";
 
@@ -68,12 +73,20 @@ export async function addRow(
     }
   }
 
-  const { error } = await supabase.from(table).insert(row);
+  const { data: inserted, error } = await supabase.from(table).insert(row).select().single();
   if (error) return { error: error.message };
 
   revalidatePath(`/committee/${table}`);
   revalidatePath(`/${table}`);
-  return { success: true };
+
+  const summaryField = config.fields.find((f) => f.type === "textarea");
+  return {
+    success: {
+      id: String(inserted.id),
+      title: String(row[config.titleField] ?? ""),
+      summary: summaryField ? String(row[summaryField.name] ?? "") : "",
+    },
+  };
 }
 
 export async function deleteRow(table: TableName, id: string) {
