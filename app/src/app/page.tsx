@@ -1,14 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import WeatherWidget from "@/components/WeatherWidget";
-import { getNews, getEvents } from "@/lib/content";
+import { getNews, getEvents, getSiteSettings } from "@/lib/content";
 import { PikeIcon, TroutIcon } from "@/components/icons/FishIcons";
 import clubHero from "../../public/images/club-hero.jpg";
 
 export default async function Home() {
-  const [news, events] = await Promise.all([getNews(), getEvents()]);
+  const [news, events, settings] = await Promise.all([getNews(), getEvents(), getSiteSettings()]);
   const latestNews = news.slice(0, 3);
-  const upcomingEvents = events.slice(0, 3);
+  const today = new Date().toISOString().slice(0, 10);
+  const upcomingEvents = events.filter((e) => String(e.event_date).slice(0, 10) >= today).slice(0, 3);
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-10 px-4 py-10">
@@ -31,6 +32,15 @@ export default async function Home() {
         </div>
         <PikeIcon className="h-6 w-full text-sky-700/40 dark:text-sky-400/30" />
       </section>
+
+      {settings.final_results_published && (
+        <Link
+          href="/leaderboard"
+          className="rounded-lg border border-amber-500 bg-amber-50 p-4 text-sm font-medium text-amber-900 hover:border-amber-600 dark:border-amber-500/50 dark:bg-amber-950/40 dark:text-amber-200"
+        >
+          🏆 Final season {settings.season_year ?? ""} results are published — see the leaderboard
+        </Link>
+      )}
 
       <WeatherWidget />
 
@@ -91,6 +101,21 @@ export default async function Home() {
             ))}
           </ul>
         </section>
+      </div>
+
+      <div className="flex flex-wrap gap-3 text-sm">
+        <Link
+          href="/results"
+          className="rounded-full border border-slate-300 px-4 py-2 text-slate-700 hover:border-amber-500 dark:border-slate-700 dark:text-slate-300"
+        >
+          Browse previous competitions →
+        </Link>
+        <Link
+          href="/gallery"
+          className="rounded-full border border-slate-300 px-4 py-2 text-slate-700 hover:border-amber-500 dark:border-slate-700 dark:text-slate-300"
+        >
+          Photo gallery →
+        </Link>
       </div>
     </div>
   );

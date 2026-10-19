@@ -30,6 +30,11 @@ alter table events add column if not exists finish_location text;
 alter table events add column if not exists presentation_location text;
 alter table events add column if not exists image_url text;
 
+-- Legacy standalone "competitions" concept — superseded by events.format
+-- below (every event can now carry results directly, so the committee
+-- manages one thing - Events - instead of two overlapping ones). Table kept
+-- so nothing breaks for anyone still pointing at it; new code never writes
+-- to it.
 create table if not exists competitions (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -41,10 +46,20 @@ create table if not exists competitions (
 
 create table if not exists competition_photos (
   id uuid primary key default gen_random_uuid(),
-  competition_id uuid not null references competitions(id) on delete cascade,
+  competition_id uuid references competitions(id) on delete cascade,
   url text not null,
   created_at timestamptz not null default now()
 );
+alter table competition_photos alter column competition_id drop not null;
+alter table competition_photos add column if not exists event_id uuid references events(id) on delete cascade;
+
+-- Fishing format per event - also doubles as "is this event a competition
+-- with results" marker; shown as a trout/pike icon on the public Events
+-- list. One format per event (not combinable) - the admin form says so.
+alter table events add column if not exists format text
+  check (format in ('trout', 'pike', 'catch_release', 'all_purpose', 'fly_dapping'));
+alter table events add column if not exists sponsor_name text;
+alter table events add column if not exists sponsor_logo_url text;
 
 create table if not exists results (
   id uuid primary key default gen_random_uuid(),
@@ -55,6 +70,27 @@ create table if not exists results (
   position int
 );
 alter table results add column if not exists competition_id uuid references competitions(id) on delete set null;
+alter table results add column if not exists event_id uuid references events(id) on delete set null;
+alter table results add column if not exists species text check (species in ('trout', 'pike', 'other'));
+alter table results add column if not exists measurement_type text check (measurement_type in ('weight_lb', 'length_cm'));
+alter table results add column if not exists measurement_value numeric;
+alter table results add column if not exists points numeric;
+-- Results start pending and only count publicly (leaderboards, archive)
+-- once a committee member approves them - "review before approving".
+alter table results add column if not exists status text not null default 'pending'
+  check (status in ('pending', 'approved'));
+
+-- Single-row site-wide settings - currently just the "final results
+-- published" flag the committee flips manually at season end (no hard-coded
+-- date, per the brief).
+create table if not exists site_settings (
+  id int primary key default 1,
+  final_results_published boolean not null default false,
+  season_year int,
+  updated_at timestamptz not null default now(),
+  constraint single_row check (id = 1)
+);
+insert into site_settings (id) values (1) on conflict (id) do nothing;
 
 create table if not exists rules (
   id uuid primary key default gen_random_uuid(),
@@ -89,6 +125,12 @@ alter table competitions enable row level security;
 alter table competition_photos enable row level security;
 alter table rules enable row level security;
 alter table templates enable row level security;
+alter table site_settings enable row level security;
+
+drop policy if exists "Public read" on site_settings;
+create policy "Public read" on site_settings for select using (true);
+drop policy if exists "Committee write" on site_settings;
+create policy "Committee write" on site_settings for update using (auth.role() = 'authenticated');
 
 -- Members contain personal data (email), so unlike the other tables
 -- they are NOT publicly readable — committee only. Templates are also

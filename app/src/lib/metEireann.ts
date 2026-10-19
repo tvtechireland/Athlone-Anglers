@@ -151,6 +151,37 @@ export function buildWeeklyForecast(entries: ForecastEntry[]): DailyForecast[] {
   return days;
 }
 
+export type HourlyForecast = {
+  time: string; // ISO
+  hourLabel: string; // "14:00"
+  temperatureC: number | null;
+  windSpeedKmh: number | null;
+  windDirectionDeg: number | null;
+};
+
+const DUBLIN_HOUR_LABEL = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Europe/Dublin",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+// Every hour Met Éireann has a reading for on the given local date (for the
+// "tap a day, see it hour by hour" detail view) - wind matters most here
+// since that's what anglers actually plan a session around.
+export function buildHourlyForecast(entries: ForecastEntry[], dateKey: string): HourlyForecast[] {
+  return entries
+    .filter((e) => e.temperatureC !== null && localDateKey(e.from) === dateKey)
+    .map((e) => ({
+      time: e.from,
+      hourLabel: DUBLIN_HOUR_LABEL.format(new Date(e.from)),
+      temperatureC: e.temperatureC,
+      windSpeedKmh: e.windSpeedMps != null ? Math.round(e.windSpeedMps * 3.6) : null,
+      windDirectionDeg: e.windDirectionDeg,
+    }))
+    .sort((a, b) => a.time.localeCompare(b.time));
+}
+
 export async function fetchAthloneForecast(): Promise<ForecastEntry[]> {
   const url = `${FORECAST_URL}?lat=${ATHLONE_COORDS.lat};long=${ATHLONE_COORDS.long}`;
 

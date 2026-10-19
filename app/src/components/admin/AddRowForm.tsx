@@ -78,6 +78,9 @@ export default function AddRowForm({
       {fields.map((field) => (
         <label key={field.name} className="flex flex-col gap-1 text-sm">
           <span className="text-slate-600 dark:text-slate-400">{field.label}</span>
+          {field.help && (
+            <span className="text-xs text-slate-400">{field.help}</span>
+          )}
           {field.type === "textarea" ? (
             <textarea
               name={field.name}
@@ -102,11 +105,15 @@ export default function AddRowForm({
               <option value="" disabled>
                 Select…
               </option>
-              {field.options?.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
+              {field.options?.map((opt) => {
+                const value = typeof opt === "string" ? opt : opt.value;
+                const label = typeof opt === "string" ? opt : opt.label;
+                return (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                );
+              })}
             </select>
           ) : (
             <input

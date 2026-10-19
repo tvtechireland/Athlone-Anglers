@@ -36,6 +36,16 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             year: "numeric",
           })}
         </p>
+        {event.sponsor_name && (
+          <p className="mt-1 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+            Sponsored by
+            {event.sponsor_logo_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={event.sponsor_logo_url} alt="" className="h-5 w-5 rounded object-contain" />
+            )}
+            {event.sponsor_name}
+          </p>
+        )}
       </div>
 
       {event.description && (

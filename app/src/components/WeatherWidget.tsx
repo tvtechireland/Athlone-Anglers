@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import type { DailyForecast } from "@/lib/metEireann";
 
 function WindCompass({ directionDeg }: { directionDeg: number | null }) {
@@ -56,14 +57,20 @@ export default function WeatherWidget() {
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-      <h3 className="mb-3 text-sm font-semibold text-slate-500 dark:text-slate-400">
-        Athlone conditions this week — Met Éireann
-      </h3>
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400">
+          Athlone conditions this week — Met Éireann
+        </h3>
+        <Link href="/weather" className="text-xs text-amber-700 hover:underline dark:text-amber-400">
+          Hour by hour →
+        </Link>
+      </div>
       <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
         {days.map((day) => (
-          <div
+          <Link
             key={day.date}
-            className="flex w-24 flex-shrink-0 snap-start flex-col items-center gap-2 rounded-md border border-slate-100 p-2 text-center dark:border-slate-800"
+            href={`/weather?date=${day.date}`}
+            className="flex w-24 flex-shrink-0 snap-start flex-col items-center gap-2 rounded-md border border-slate-100 p-2 text-center transition hover:border-amber-500 dark:border-slate-800"
           >
             <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
               {day.isToday ? "Today" : day.weekday}
@@ -79,7 +86,7 @@ export default function WeatherWidget() {
                 </span>
               </>
             )}
-          </div>
+          </Link>
         ))}
       </div>
     </div>

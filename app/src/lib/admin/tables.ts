@@ -5,8 +5,12 @@ export type FieldConfig = {
   label: string;
   type: FieldType;
   required?: boolean;
-  // Options for type "select".
-  options?: string[];
+  // Options for type "select". For a clearer admin UI, pass
+  // {value, label} pairs instead of plain strings where the stored value
+  // (e.g. "catch_release") shouldn't be shown verbatim.
+  options?: string[] | { value: string; label: string }[];
+  // Short help text shown under the field in the add form.
+  help?: string;
 };
 
 export type TableConfig = {
@@ -52,33 +56,34 @@ export const TABLE_CONFIGS: Record<string, TableConfig> = {
       { name: "title", label: "Title", type: "text", required: true },
       { name: "description", label: "Description", type: "textarea" },
       { name: "event_date", label: "Date", type: "date", required: true },
+      {
+        name: "format",
+        label: "Fishing type",
+        type: "select",
+        options: [
+          { value: "trout", label: "Trout competition" },
+          { value: "pike", label: "Pike competition" },
+          { value: "catch_release", label: "Catch-and-release only" },
+          { value: "all_purpose", label: "All-purpose fishing" },
+          { value: "fly_dapping", label: "Fly and dapping only" },
+        ],
+        help: "Pick the one type that best fits — an event is only ever one type, they're not combined.",
+      },
       { name: "location", label: "Start location", type: "text" },
       { name: "finish_location", label: "Finish / weigh-in location", type: "text" },
       { name: "presentation_location", label: "Presentation location", type: "text" },
+      { name: "sponsor_name", label: "Sponsor (optional)", type: "text" },
+      { name: "sponsor_logo_url", label: "Sponsor logo (optional)", type: "image" },
       { name: "image_url", label: "Photo (optional)", type: "image" },
     ],
   },
+  // No add-form is rendered for this (results are entered via the
+  // dedicated "Record results" screen, not the generic admin form) — kept
+  // in the allowlist purely so deleteRow("results", id) is permitted.
   results: {
-    label: "Competition results",
-    titleField: "competition_name",
-    fields: [
-      { name: "competition_name", label: "Competition", type: "text", required: true },
-      { name: "event_date", label: "Date", type: "date", required: true },
-      { name: "angler_name", label: "Angler", type: "text", required: true },
-      { name: "weight_kg", label: "Weight (kg)", type: "number" },
-      { name: "position", label: "Position", type: "number" },
-    ],
-  },
-  competitions: {
-    label: "Competitions",
-    titleField: "name",
-    duplicateFields: ["name", "event_date"],
-    fields: [
-      { name: "name", label: "Name", type: "text", required: true },
-      { name: "event_date", label: "Date", type: "date", required: true },
-      { name: "sponsor_name", label: "Sponsor (optional)", type: "text" },
-      { name: "sponsor_logo_url", label: "Sponsor logo (optional)", type: "image" },
-    ],
+    label: "Results",
+    titleField: "angler_name",
+    fields: [],
   },
   rules: {
     label: "Club rules",
@@ -103,11 +108,4 @@ export const TABLE_CONFIGS: Record<string, TableConfig> = {
   },
 };
 
-export type TableName =
-  | "members"
-  | "news"
-  | "events"
-  | "results"
-  | "competitions"
-  | "rules"
-  | "templates";
+export type TableName = "members" | "news" | "events" | "results" | "rules" | "templates";
