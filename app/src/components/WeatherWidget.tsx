@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { DailyForecast } from "@/lib/metEireann";
+import { weatherEmoji, type DailyForecast } from "@/lib/metEireann";
 
 function WindCompass({ directionDeg }: { directionDeg: number | null }) {
   return (
@@ -80,6 +80,9 @@ export default function WeatherWidget() {
             ) : (
               <>
                 <span className="text-lg font-bold text-slate-900 dark:text-white">{day.temperatureC}°C</span>
+                <span className="text-xl leading-none" title={day.symbol ?? undefined}>
+                  {weatherEmoji(day.symbol)}
+                </span>
                 <WindCompass directionDeg={day.windDirectionDeg} />
                 <span className="text-xs text-slate-500 dark:text-slate-400">
                   {day.windSpeedKmh ?? "–"} km/h

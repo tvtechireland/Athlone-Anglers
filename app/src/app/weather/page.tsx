@@ -4,6 +4,7 @@ import {
   buildHourlyForecast,
   buildWeeklyForecast,
   fetchAthloneForecast,
+  weatherEmoji,
 } from "@/lib/metEireann";
 
 // Club only fishes Sundays, 9am-6pm - on a Sunday, show a fixed row per
@@ -17,10 +18,14 @@ function isSundayKey(dateKey: string): boolean {
 
 function WindCompass({ directionDeg }: { directionDeg: number | null }) {
   return (
-    <div className="relative h-10 w-10 flex-shrink-0 rounded-full border border-slate-300 dark:border-slate-600">
+    <div className="relative h-12 w-12 flex-shrink-0 rounded-full border border-slate-300 dark:border-slate-600">
+      <span className="absolute left-1/2 top-0.5 -translate-x-1/2 text-[9px] text-slate-400">N</span>
+      <span className="absolute right-0.5 top-1/2 -translate-y-1/2 text-[9px] text-slate-400">E</span>
+      <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-[9px] text-slate-400">S</span>
+      <span className="absolute left-0.5 top-1/2 -translate-y-1/2 text-[9px] text-slate-400">W</span>
       {directionDeg !== null && (
         <div
-          className="absolute left-1/2 top-1/2 -ml-px -mt-3.5 h-3.5 w-0.5 bg-sky-600 dark:bg-sky-400"
+          className="absolute left-1/2 top-1/2 -ml-px -mt-4 h-4 w-0.5 bg-sky-600 dark:bg-sky-400"
           style={{ transform: `rotate(${directionDeg}deg)`, transformOrigin: "bottom center" }}
           title={`Wind from ${directionDeg}°`}
         >
@@ -123,7 +128,12 @@ export default async function WeatherPage({
                   {h.temperatureC ?? "—"}°C
                 </span>
                 <div className="flex items-center gap-2">
-                  <WindCompass directionDeg={h.windDirectionDeg} />
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-xl leading-none" title={h.symbol ?? undefined}>
+                      {weatherEmoji(h.symbol)}
+                    </span>
+                    <WindCompass directionDeg={h.windDirectionDeg} />
+                  </div>
                   <span className="w-16 text-sm text-slate-500 dark:text-slate-400">
                     {h.windSpeedKmh ?? "–"} km/h
                   </span>

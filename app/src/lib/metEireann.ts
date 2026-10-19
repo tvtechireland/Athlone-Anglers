@@ -81,7 +81,25 @@ export type DailyForecast = {
   temperatureC: number | null;
   windSpeedKmh: number | null;
   windDirectionDeg: number | null;
+  symbol: string | null;
 };
+
+// Met Éireann's symbol names are the old yr.no vocabulary (Sun, LightCloud,
+// PartlyCloud, Cloud, LightRain, Rain, RainShowers, Sleet, Snow, Fog, ...) -
+// rather than hard-coding every exact name, bucket by substring into the
+// handful of conditions anyone glancing at an icon actually cares about.
+export function weatherEmoji(symbol: string | null): string {
+  if (!symbol) return "";
+  const s = symbol.toLowerCase();
+  if (s.includes("thunder")) return "⛈️";
+  if (s.includes("snow")) return "❄️";
+  if (s.includes("sleet")) return "🌨️";
+  if (s.includes("rain") || s.includes("shower") || s.includes("drizzle")) return "🌧️";
+  if (s.includes("fog")) return "🌫️";
+  if (s.includes("cloud")) return "⛅";
+  if (s.includes("sun") || s.includes("clear")) return "☀️";
+  return "";
+}
 
 const DUBLIN_DATE = new Intl.DateTimeFormat("en-CA", {
   timeZone: "Europe/Dublin",
@@ -145,6 +163,7 @@ export function buildWeeklyForecast(entries: ForecastEntry[]): DailyForecast[] {
       temperatureC: best?.temperatureC ?? null,
       windSpeedKmh: best?.windSpeedMps != null ? Math.round(best.windSpeedMps * 3.6) : null,
       windDirectionDeg: best?.windDirectionDeg ?? null,
+      symbol: best?.symbol ?? null,
     });
   }
 
@@ -157,6 +176,7 @@ export type HourlyForecast = {
   temperatureC: number | null;
   windSpeedKmh: number | null;
   windDirectionDeg: number | null;
+  symbol: string | null;
 };
 
 const DUBLIN_HOUR_LABEL = new Intl.DateTimeFormat("en-GB", {
@@ -178,6 +198,7 @@ export function buildHourlyForecast(entries: ForecastEntry[], dateKey: string): 
       temperatureC: e.temperatureC,
       windSpeedKmh: e.windSpeedMps != null ? Math.round(e.windSpeedMps * 3.6) : null,
       windDirectionDeg: e.windDirectionDeg,
+      symbol: e.symbol,
     }))
     .sort((a, b) => a.time.localeCompare(b.time));
 }
@@ -206,6 +227,7 @@ export function buildFishingHoursForecast(entries: ForecastEntry[], dateKey: str
       temperatureC: best?.temperatureC ?? null,
       windSpeedKmh: best?.windSpeedMps != null ? Math.round(best.windSpeedMps * 3.6) : null,
       windDirectionDeg: best?.windDirectionDeg ?? null,
+      symbol: best?.symbol ?? null,
     });
   }
   return hours;
