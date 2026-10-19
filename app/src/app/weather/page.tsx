@@ -5,6 +5,14 @@ import {
   fetchAthloneForecast,
 } from "@/lib/metEireann";
 
+// Club only fishes Sundays, 10am-6pm - on a Sunday, narrow the hourly table
+// to that window instead of the full day, so there's no scrolling past
+// hours nobody's on the water for.
+function isSundayKey(dateKey: string): boolean {
+  const [y, m, d] = dateKey.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).getUTCDay() === 0;
+}
+
 function WindCompass({ directionDeg }: { directionDeg: number | null }) {
   return (
     <div className="relative h-10 w-10 flex-shrink-0 rounded-full border border-slate-300 dark:border-slate-600">
@@ -38,8 +46,15 @@ export default async function WeatherPage({
 
   const days = buildWeeklyForecast(entries);
   const selectedDate = date && days.some((d) => d.date === date) ? date : days[0]?.date;
-  const hours = selectedDate ? buildHourlyForecast(entries, selectedDate) : [];
+  const allHours = selectedDate ? buildHourlyForecast(entries, selectedDate) : [];
   const selectedDay = days.find((d) => d.date === selectedDate);
+  const isFishingDay = selectedDate ? isSundayKey(selectedDate) : false;
+  const hours = isFishingDay
+    ? allHours.filter((h) => {
+        const hour = Number(h.hourLabel.split(":")[0]);
+        return hour >= 10 && hour <= 18;
+      })
+    : allHours;
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10">
@@ -79,13 +94,14 @@ export default async function WeatherPage({
                 day: "numeric",
                 month: "long",
               })}
+              {isFishingDay && " · fishing hours, 10am–6pm"}
             </p>
           )}
 
           <div className="flex flex-col divide-y divide-slate-200 overflow-hidden rounded-lg border border-slate-200 dark:divide-slate-800 dark:border-slate-800">
             {hours.length === 0 && (
               <p className="p-4 text-sm text-slate-500 dark:text-slate-400">
-                No hourly data available for that day.
+                No hourly data available for that day{isFishingDay ? " between 10am and 6pm" : ""}.
               </p>
             )}
             {hours.map((h) => (

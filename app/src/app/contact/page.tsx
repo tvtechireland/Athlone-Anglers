@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function ContactPage() {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-10">
@@ -15,6 +17,17 @@ export default function ContactPage() {
           , or speak to a committee member at the club.
         </p>
       </div>
+
+      <div className="rounded-lg border border-amber-500 bg-amber-50 p-4 dark:border-amber-500/50 dark:bg-amber-950/40">
+        <p className="mb-3 font-medium text-amber-900 dark:text-amber-200">Are you a committee member?</p>
+        <Link
+          href="/committee/login"
+          className="inline-block rounded bg-amber-700 px-4 py-3 text-base font-semibold text-white hover:bg-amber-600 dark:bg-amber-500 dark:text-slate-950 dark:hover:bg-amber-400"
+        >
+          Committee login →
+        </Link>
+      </div>
+
       <p className="text-xs text-slate-400">
         (Committee: tell me the details you want here — a phone number, email, or meeting night — and
         I&apos;ll add them.)
