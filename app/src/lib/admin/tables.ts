@@ -11,6 +11,10 @@ export type FieldConfig = {
   options?: string[] | { value: string; label: string }[];
   // Short help text shown under the field in the add form.
   help?: string;
+  // Only show this field in the add form when another field currently
+  // holds a specific value (e.g. the trout rule type only makes sense
+  // once "Trout competition" is picked as the fishing type).
+  showWhen?: { field: string; equals: string };
 };
 
 export type TableConfig = {
@@ -63,11 +67,19 @@ export const TABLE_CONFIGS: Record<string, TableConfig> = {
         options: [
           { value: "trout", label: "Trout competition" },
           { value: "pike", label: "Pike competition" },
-          { value: "catch_release", label: "Catch-and-release only" },
-          { value: "all_purpose", label: "All-purpose fishing" },
-          { value: "fly_dapping", label: "Fly and dapping only" },
         ],
-        help: "Pick the one type that best fits — an event is only ever one type, they're not combined.",
+        help: "Pike rules are always the same. For trout, you'll also pick the rule type below.",
+      },
+      {
+        name: "trout_rule_type",
+        label: "Trout rule type",
+        type: "select",
+        options: [
+          { value: "all_purpose", label: "All-purpose fishing" },
+          { value: "catch_release", label: "Catch-and-release only" },
+          { value: "all_methods", label: "All methods" },
+        ],
+        showWhen: { field: "format", equals: "trout" },
       },
       { name: "location", label: "Start location", type: "text" },
       { name: "finish_location", label: "Finish / weigh-in location", type: "text" },

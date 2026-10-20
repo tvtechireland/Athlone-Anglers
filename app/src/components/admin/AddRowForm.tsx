@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { useActionState, useRef, useState } from "react";
 import { addRow } from "@/lib/admin/actions";
 import { FieldConfig, TableName } from "@/lib/admin/tables";
 
@@ -27,6 +27,15 @@ export default function AddRowForm({
   const [state, formAction, pending] = useActionState(boundAddRow, undefined);
   const formRef = useRef<HTMLFormElement>(null);
   const today = new Date().toISOString().slice(0, 10);
+
+  // Tracks the current value of any field that another field's showWhen
+  // depends on, so conditional fields (e.g. trout rule type) appear/
+  // disappear live as the committee member picks an option.
+  const [watchedValues, setWatchedValues] = useState<Record<string, string>>({});
+  function isVisible(field: FieldConfig) {
+    if (!field.showWhen) return true;
+    return watchedValues[field.showWhen.field] === field.showWhen.equals;
+  }
 
   const shareable = table === "news" || table === "events";
   const shareUrl =
@@ -95,7 +104,7 @@ export default function AddRowForm({
         </label>
       )}
 
-      {fields.map((field) => (
+      {fields.filter(isVisible).map((field) => (
         <label key={field.name} className="flex flex-col gap-1 text-sm">
           <span className="text-slate-600 dark:text-slate-400">{field.label}</span>
           {field.help && (
@@ -120,6 +129,9 @@ export default function AddRowForm({
               name={field.name}
               required={field.required}
               defaultValue=""
+              onChange={(e) =>
+                setWatchedValues((prev) => ({ ...prev, [field.name]: e.target.value }))
+              }
               className="rounded border border-slate-300 bg-white px-2 py-1 dark:border-slate-700 dark:bg-slate-800"
             >
               <option value="" disabled>
