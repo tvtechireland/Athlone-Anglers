@@ -106,6 +106,13 @@ export async function getRules() {
   return data && data.length > 0 ? data : SAMPLE_RULES;
 }
 
+export async function getSponsors() {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data } = await supabase.from("sponsors").select("*").order("name", { ascending: true });
+  return data ?? [];
+}
+
 export async function getSiteSettings() {
   const supabase = await createClient();
   if (!supabase) return { final_results_published: false, season_year: null as number | null };

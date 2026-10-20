@@ -1,12 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import WeatherWidget from "@/components/WeatherWidget";
-import { getEvents, getSiteSettings } from "@/lib/content";
+import { getEvents, getSiteSettings, getSponsors } from "@/lib/content";
 import { PikeIcon } from "@/components/icons/FishIcons";
 import clubHero from "../../public/images/club-hero.jpg";
 
 export default async function Home() {
-  const [events, settings] = await Promise.all([getEvents(), getSiteSettings()]);
+  const [events, settings, sponsors] = await Promise.all([getEvents(), getSiteSettings(), getSponsors()]);
   const today = new Date().toISOString().slice(0, 10);
   const upcomingEvents = events.filter((e) => String(e.event_date).slice(0, 10) >= today).slice(0, 3);
 
@@ -92,6 +92,35 @@ export default async function Home() {
           Photo gallery →
         </Link>
       </div>
+
+      {sponsors.length > 0 && (
+        <section>
+          <h2 className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">Our sponsors</h2>
+          <ul className="flex flex-wrap items-center gap-6">
+            {sponsors.map((s) => (
+              <li key={s.id}>
+                {s.website_url ? (
+                  <a href={s.website_url} target="_blank" rel="noopener noreferrer" className="block">
+                    {s.logo_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={s.logo_url} alt={s.name} className="h-14 w-auto object-contain" />
+                    ) : (
+                      <span className="text-sm font-medium text-slate-700 hover:underline dark:text-slate-300">
+                        {s.name}
+                      </span>
+                    )}
+                  </a>
+                ) : s.logo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={s.logo_url} alt={s.name} className="h-14 w-auto object-contain" />
+                ) : (
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{s.name}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

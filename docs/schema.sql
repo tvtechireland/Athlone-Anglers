@@ -56,8 +56,11 @@ alter table competition_photos add column if not exists event_id uuid references
 -- Fishing format per event - also doubles as "is this event a competition
 -- with results" marker; shown as a trout/pike icon on the public Events
 -- list. One format per event (not combinable) - the admin form says so.
+alter table events drop constraint if exists events_format_check;
 alter table events add column if not exists format text
-  check (format in ('trout', 'pike', 'catch_release', 'all_purpose', 'fly_dapping'));
+  check (format in ('trout', 'pike'));
+alter table events add column if not exists trout_rule_type text
+  check (trout_rule_type in ('all_purpose', 'catch_release', 'all_methods'));
 alter table events add column if not exists sponsor_name text;
 alter table events add column if not exists sponsor_logo_url text;
 
@@ -114,6 +117,18 @@ create table if not exists templates (
   presentation_location text,
   created_at timestamptz not null default now()
 );
+alter table templates drop constraint if exists templates_kind_check;
+alter table templates add constraint templates_kind_check check (kind in ('event', 'news', 'announcement'));
+
+-- Club sponsors - shown publicly (thanking them), managed from the
+-- committee area like any other content table.
+create table if not exists sponsors (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  logo_url text,
+  website_url text,
+  created_at timestamptz not null default now()
+);
 
 -- Row Level Security: anyone can read (public site), only logged-in
 -- committee members (Supabase Auth users) can write.
@@ -126,6 +141,7 @@ alter table competition_photos enable row level security;
 alter table rules enable row level security;
 alter table templates enable row level security;
 alter table site_settings enable row level security;
+alter table sponsors enable row level security;
 
 drop policy if exists "Public read" on site_settings;
 create policy "Public read" on site_settings for select using (true);
@@ -152,6 +168,8 @@ drop policy if exists "Public read" on competition_photos;
 create policy "Public read" on competition_photos for select using (true);
 drop policy if exists "Public read" on rules;
 create policy "Public read" on rules for select using (true);
+drop policy if exists "Public read" on sponsors;
+create policy "Public read" on sponsors for select using (true);
 
 drop policy if exists "Committee write" on news;
 create policy "Committee write" on news for insert with check (auth.role() = 'authenticated');
@@ -192,6 +210,13 @@ drop policy if exists "Committee update" on rules;
 create policy "Committee update" on rules for update using (auth.role() = 'authenticated');
 drop policy if exists "Committee delete" on rules;
 create policy "Committee delete" on rules for delete using (auth.role() = 'authenticated');
+
+drop policy if exists "Committee write" on sponsors;
+create policy "Committee write" on sponsors for insert with check (auth.role() = 'authenticated');
+drop policy if exists "Committee update" on sponsors;
+create policy "Committee update" on sponsors for update using (auth.role() = 'authenticated');
+drop policy if exists "Committee delete" on sponsors;
+create policy "Committee delete" on sponsors for delete using (auth.role() = 'authenticated');
 
 -- Storage bucket for news/event photos and sponsor logos. Create the bucket
 -- itself in the Supabase dashboard (Storage > New bucket > "public-images",

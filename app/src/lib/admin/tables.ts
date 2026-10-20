@@ -109,15 +109,42 @@ export const TABLE_CONFIGS: Record<string, TableConfig> = {
     label: "Templates",
     titleField: "name",
     fields: [
-      { name: "kind", label: "Use for", type: "select", options: ["event", "news"], required: true },
+      {
+        name: "kind",
+        label: "Use for",
+        type: "select",
+        required: true,
+        options: [
+          { value: "event", label: "Event" },
+          { value: "news", label: "News" },
+          { value: "announcement", label: "WhatsApp announcement" },
+        ],
+      },
       { name: "name", label: "Template name", type: "text", required: true },
       { name: "title", label: "Default title (optional)", type: "text" },
-      { name: "body", label: "Default write-up (description / body)", type: "textarea" },
+      { name: "body", label: "Default write-up (description / body / message)", type: "textarea" },
       { name: "location", label: "Start location (events only)", type: "text" },
       { name: "finish_location", label: "Finish / weigh-in location (events only)", type: "text" },
       { name: "presentation_location", label: "Presentation location (events only)", type: "text" },
     ],
   },
+  sponsors: {
+    label: "Sponsors",
+    titleField: "name",
+    duplicateFields: ["name"],
+    fields: [
+      { name: "name", label: "Sponsor name", type: "text", required: true },
+      { name: "logo_url", label: "Logo", type: "image" },
+      { name: "website_url", label: "Website (optional)", type: "text" },
+    ],
+  },
 };
 
-export type TableName = "members" | "news" | "events" | "results" | "rules" | "templates";
+export type TableName =
+  | "members"
+  | "news"
+  | "events"
+  | "results"
+  | "rules"
+  | "templates"
+  | "sponsors";
