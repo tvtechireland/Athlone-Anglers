@@ -52,15 +52,42 @@ export async function recordWinners(
     if (!angler) continue;
 
     const species = String(formData.get(`species_${position}`) ?? "other");
-    const measurementType = String(formData.get(`unit_${position}`) ?? "weight_lb");
-    const valueRaw = formData.get(`value_${position}`);
-    const measurementValue = valueRaw ? Number(valueRaw) : null;
     const pointsRaw = formData.get(`points_${position}`);
     const points = pointsRaw !== null && pointsRaw !== "" ? Number(pointsRaw) : defaultPoints(position);
 
-    const resultLabel = measurementValue
-      ? `${measurementValue} ${measurementType === "weight_lb" ? "lb" : "cm"}`
-      : "—";
+    // Trout are weighed in lb+oz, pike measured in cm - which fields got
+    // filled in depends on which species was picked for this box.
+    let measurementType: string | null = null;
+    let measurementValue: number | null = null;
+    let resultLabel = "—";
+
+    if (species === "trout") {
+      const lbRaw = formData.get(`lb_${position}`);
+      const ozRaw = formData.get(`oz_${position}`);
+      const lb = lbRaw ? Number(lbRaw) : 0;
+      const oz = ozRaw ? Number(ozRaw) : 0;
+      if (lb || oz) {
+        measurementType = "weight_lb";
+        measurementValue = lb + oz / 16;
+        resultLabel = oz ? `${lb} lb ${oz} oz` : `${lb} lb`;
+      }
+    } else if (species === "pike") {
+      const cmRaw = formData.get(`cm_${position}`);
+      if (cmRaw && cmRaw !== "") {
+        measurementType = "length_cm";
+        measurementValue = Number(cmRaw);
+        resultLabel = `${measurementValue} cm`;
+      }
+    } else {
+      const unit = String(formData.get(`unit_${position}`) ?? "weight_lb");
+      const valueRaw = formData.get(`value_${position}`);
+      if (valueRaw && valueRaw !== "") {
+        measurementType = unit;
+        measurementValue = Number(valueRaw);
+        resultLabel = `${measurementValue} ${unit === "weight_lb" ? "lb" : "cm"}`;
+      }
+    }
+
     placings.push({ position, angler, result: resultLabel });
 
     const row = {

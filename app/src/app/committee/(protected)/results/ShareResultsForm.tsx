@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { useActionState, useRef, useState } from "react";
 import Link from "next/link";
 import { recordWinners, WinnersFormState } from "./actions";
 
@@ -31,6 +31,13 @@ export default function ShareResultsForm({ events }: { events: EventRow[] }) {
   const [state, formAction, pending] = useActionState(recordWinners, undefined);
   const formRef = useRef<HTMLFormElement>(null);
 
+  // Trout are weighed in lb+oz, pike measured in cm - which inputs show per
+  // box follows that box's own species choice, not just the event default.
+  const [species, setSpecies] = useState<string[]>(["other", "other", "other", "other", "other"]);
+  function setRowSpecies(i: number, value: string) {
+    setSpecies((prev) => prev.map((s, idx) => (idx === i ? value : s)));
+  }
+
   const shareLines = buildShareLines(state?.success);
   const whatsappHref = shareLines.length
     ? `https://wa.me/?text=${encodeURIComponent(shareLines.join("\n"))}`
@@ -51,11 +58,8 @@ export default function ShareResultsForm({ events }: { events: EventRow[] }) {
   function onEventChange(eventId: string) {
     const event = events.find((e) => e.id === eventId);
     const defaultSpecies = event?.format ? SPECIES_BY_FORMAT[event.format] : undefined;
-    if (!defaultSpecies || !formRef.current) return;
-    for (let i = 1; i <= 5; i++) {
-      const el = formRef.current.elements.namedItem(`species_${i}`) as HTMLSelectElement | null;
-      if (el) el.value = defaultSpecies;
-    }
+    if (!defaultSpecies) return;
+    setSpecies(Array(5).fill(defaultSpecies));
   }
 
   return (
@@ -102,7 +106,7 @@ export default function ShareResultsForm({ events }: { events: EventRow[] }) {
           {ORDINALS.map((label, i) => (
             <div
               key={label}
-              className="grid gap-2 rounded border border-slate-200 p-3 dark:border-slate-700 sm:grid-cols-[4rem_1fr_auto_6rem_5rem]"
+              className="grid gap-2 rounded border border-slate-200 p-3 dark:border-slate-700 sm:grid-cols-[4rem_1fr_auto_auto_5rem]"
             >
               <span className="self-center font-semibold text-slate-700 dark:text-slate-300">{label}</span>
               <input
@@ -113,30 +117,65 @@ export default function ShareResultsForm({ events }: { events: EventRow[] }) {
               />
               <select
                 name={`species_${i + 1}`}
-                defaultValue="other"
+                value={species[i]}
+                onChange={(e) => setRowSpecies(i, e.target.value)}
                 className="rounded border border-slate-300 bg-white px-2 py-2 text-base dark:border-slate-700 dark:bg-slate-800"
               >
                 <option value="trout">Trout</option>
                 <option value="pike">Pike</option>
                 <option value="other">Other</option>
               </select>
-              <div className="flex gap-1">
+
+              {species[i] === "trout" ? (
+                <div className="flex gap-1">
+                  <input
+                    name={`lb_${i + 1}`}
+                    type="number"
+                    min={0}
+                    placeholder="lb"
+                    aria-label="Pounds"
+                    className="w-16 min-w-0 rounded border border-slate-300 bg-white px-2 py-2 text-base dark:border-slate-700 dark:bg-slate-800"
+                  />
+                  <input
+                    name={`oz_${i + 1}`}
+                    type="number"
+                    min={0}
+                    max={15}
+                    placeholder="oz"
+                    aria-label="Ounces"
+                    className="w-16 min-w-0 rounded border border-slate-300 bg-white px-2 py-2 text-base dark:border-slate-700 dark:bg-slate-800"
+                  />
+                </div>
+              ) : species[i] === "pike" ? (
                 <input
-                  name={`value_${i + 1}`}
+                  name={`cm_${i + 1}`}
                   type="number"
-                  step="0.01"
-                  placeholder="0"
-                  className="w-full min-w-0 rounded border border-slate-300 bg-white px-2 py-2 text-base dark:border-slate-700 dark:bg-slate-800"
+                  min={0}
+                  step="0.1"
+                  placeholder="cm"
+                  aria-label="Length in centimetres"
+                  className="w-20 min-w-0 rounded border border-slate-300 bg-white px-2 py-2 text-base dark:border-slate-700 dark:bg-slate-800"
                 />
-                <select
-                  name={`unit_${i + 1}`}
-                  defaultValue="weight_lb"
-                  className="rounded border border-slate-300 bg-white px-1 py-2 text-sm dark:border-slate-700 dark:bg-slate-800"
-                >
-                  <option value="weight_lb">lb</option>
-                  <option value="length_cm">cm</option>
-                </select>
-              </div>
+              ) : (
+                <div className="flex gap-1">
+                  <input
+                    name={`value_${i + 1}`}
+                    type="number"
+                    step="0.01"
+                    placeholder="0"
+                    className="w-20 min-w-0 rounded border border-slate-300 bg-white px-2 py-2 text-base dark:border-slate-700 dark:bg-slate-800"
+                  />
+                  <select
+                    name={`unit_${i + 1}`}
+                    defaultValue="weight_lb"
+                    className="rounded border border-slate-300 bg-white px-1 py-2 text-sm dark:border-slate-700 dark:bg-slate-800"
+                  >
+                    <option value="weight_lb">lb</option>
+                    <option value="length_cm">cm</option>
+                  </select>
+                </div>
+              )}
+
               <label className="flex flex-col gap-0.5 text-xs text-slate-500 dark:text-slate-400">
                 Points
                 <input

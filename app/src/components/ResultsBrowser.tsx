@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { formatMeasurement } from "@/lib/measurement";
 
 type ResultRow = {
   id: string;
@@ -32,8 +33,7 @@ const MONTH_NAMES = [
 ];
 
 function formatResult(row: ResultRow) {
-  if (!row.measurement_value) return "—";
-  return `${row.measurement_value} ${row.measurement_type === "weight_lb" ? "lb" : "cm"}`;
+  return formatMeasurement(row.measurement_value, row.measurement_type);
 }
 
 function CalendarIcon({ className }: { className?: string }) {

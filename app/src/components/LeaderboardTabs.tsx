@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { LeaderboardRow, MeasurementRow } from "@/lib/content";
+import { formatWeightLbOz } from "@/lib/measurement";
 
 type Tab = "overall" | "longest" | "heaviest";
 
@@ -118,7 +119,7 @@ function MeasurementTable({
           <tr>
             <th className="px-3 py-2">#</th>
             <th className="px-3 py-2">Angler</th>
-            <th className="px-3 py-2">{unit === "cm" ? "Length (cm)" : "Weight (lb)"}</th>
+            <th className="px-3 py-2">{unit === "cm" ? "Length (cm)" : "Weight"}</th>
             <th className="px-3 py-2">Competition</th>
           </tr>
         </thead>
@@ -127,7 +128,7 @@ function MeasurementTable({
             <tr key={row.id}>
               <td className="px-3 py-2">{i + 1}</td>
               <td className="px-3 py-2">{row.angler}</td>
-              <td className="px-3 py-2">{row.value}</td>
+              <td className="px-3 py-2">{unit === "cm" ? `${row.value} cm` : formatWeightLbOz(row.value)}</td>
               <td className="px-3 py-2">
                 {row.competitionName} · {new Date(row.eventDate).toLocaleDateString("en-IE")}
               </td>

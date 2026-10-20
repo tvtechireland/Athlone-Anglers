@@ -1,10 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { deleteRow } from "@/lib/admin/actions";
+import { formatMeasurement } from "@/lib/measurement";
 import ShareResultsForm from "./ShareResultsForm";
 
 function formatResult(row: { measurement_value: number | null; measurement_type: string | null }) {
-  if (!row.measurement_value) return "—";
-  return `${row.measurement_value} ${row.measurement_type === "weight_lb" ? "lb" : "cm"}`;
+  return formatMeasurement(row.measurement_value, row.measurement_type);
 }
 
 function ordinal(position: number | null) {
